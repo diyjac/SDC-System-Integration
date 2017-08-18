@@ -20,7 +20,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
     ![starting simulator failure image](./imgs/sim_startup_failure_caused_by_4.4.0-92-generic_kernel.png)
 
     *To fix this issue, you will have to:*
-    * remove the 4.4.0-92-generic kernel:
+    * remove the 4.4.0-92-generic kernel (or any kernel newer than 4.4.0-91-generic):
         ```bash
         sudo apt-get remove linux-image-4.4.0-92-generic
         ```
