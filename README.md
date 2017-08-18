@@ -43,5 +43,11 @@ cd lights_no_cars
 chmod +x ros_test.x86_64
 ./ros_test.x86_64
 ```
+5. Grab a raw camera image
+```bash
+rosrun tools grabFrontCameraImage.py ../imgs/sampleout.jpg
+```
+![./imgs/sampleout.jpg](./imgs/sampleout.jpg)
+
 
 
