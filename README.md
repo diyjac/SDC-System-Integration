@@ -25,9 +25,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
         sudo apt-get remove linux-image-4.4.0-92-generic
         ```
     * reinstall the NVIDIA 375 drivers (follow the instructions):
-        ```
         [https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics](https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics)
-        ```
     
 * Download the [Udacity Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/v0.1).
 
