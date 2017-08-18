@@ -46,7 +46,7 @@ pip install -r requirements.txt
 ```bash
 cd ros
 catkin_make
-source devel/setup.sh
+source devel/setup.bash
 roslaunch launch/styx.launch
 ```
 4. Run the simulator
@@ -62,5 +62,9 @@ rosrun tools grabFrontCameraImage.py ../imgs/sampleout.jpg
 ```
 ![./imgs/sampleout.jpg](./imgs/sampleout.jpg)
 
-
+6. To dump the waypoints from the simulator
+```bash
+rosrun tools dumpWaypoints.py ../data/simulator_waypoints.csv
+```
+![./imgs/sim_waypoint_map.png](./imgs/sim_waypoint_map.png)
 
