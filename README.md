@@ -34,7 +34,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 1. Clone the project repository
 ```bash
-git clone https://github.com/udacity/carnd_capstone.git
+git clone https://github.com/diyjac/SDC-System-Integration.git
 ```
 
 2. Install python dependencies
