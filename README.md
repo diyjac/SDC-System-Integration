@@ -109,5 +109,5 @@ rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```bash
 rosrun tools viewFrontCamera.py
 ```
-![./imgs/front-camera-viewer.png](./imgs/front-camera-viewer.png)
+![./imgs/front-camera-viewer.png](./imgs/sdc-t3-sysint-front-camera-viewer.gif)
 
