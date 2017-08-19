@@ -89,6 +89,12 @@ rosrun tools dumpWaypoints.py ../data/simulator_waypoints.csv
 ```bash
 rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```
-
 ![./imgs/sim_waypoint_map.png](./imgs/sim_waypoint_map.png)
+
+8. To view the front camera in real-time from the simulator
+__NOTE__: Requires pygame!
+```bash
+rosrun tools viewFrontCamera.py
+```
+![./imgs/front-camera-viewer.png](./imgs/front-camera-viewer.png)
 
