@@ -39,7 +39,7 @@ git clone https://github.com/diyjac/SDC-System-Integration.git
 
 2. Install python dependencies
 ```bash
-cd carnd_capstone
+cd SDC-System-Integration
 pip install -r requirements.txt
 ```
 3. Make and run styx
