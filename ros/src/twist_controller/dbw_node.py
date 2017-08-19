@@ -53,10 +53,18 @@ class DBWNode(object):
         self.brake_pub = rospy.Publisher('/vehicle/brake_cmd',
                                          BrakeCmd, queue_size=1)
 
+        self.shutdown = False
+        self.dbw_enabled = False
+        self.msg_steering_report_ready = False
+        self.msg_steering_report = SteeringReport()
+
         # TODO: Create `TwistController` object
         # self.controller = TwistController(<Arguments you wish to provide>)
 
         # TODO: Subscribe to all the topics you need to
+        self.pub = rospy.Publisher('/vehicle/throttle_cmd', ThrottleCmd, queue_size=10)
+        rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
+        # rospy.Subscriber('/vehicle/steering_report', SteeringReport, self.steering_cb)
 
         self.loop()
 
@@ -70,9 +78,13 @@ class DBWNode(object):
             #                                                     <current linear velocity>,
             #                                                     <dbw status>,
             #                                                     <any other argument you need>)
-            # if <dbw is enabled>:
-            #   self.publish(throttle, brake, steer)
+            if self.dbw_enabled:
+                self.publish(0.3, 0.0, 0.0)
+                # self.publish(throttle, brake, steer)
             rate.sleep()
+
+    def dbw_enabled_cb(self, msg):
+        self.dbw_enabled = msg
 
     def publish(self, throttle, brake, steer):
         tcmd = ThrottleCmd()
