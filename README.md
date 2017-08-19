@@ -36,16 +36,20 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 ```bash
 git clone https://github.com/diyjac/SDC-System-Integration.git
 ```
-2. OPTIONAL: Checkout/Create your branch in the repository
-    * create new branch from current branch
-    ```bash
-    git checkout -b <your branch>
-    git push -u origin <your branch>
-    ```
+2. List/Checkout/Create your own branch in the repository
+    * list existing branches
+        ```bash
+        git branch
+        ```
     * switch to a different branch
-    ```bash
-    git checkout <different branch>
-    ```
+        ```bash
+        git checkout <different branch>
+        ```
+    * create new branch from current branch and push to remote repository
+        ```bash
+        git checkout -b <your branch>
+        git push -u origin <your branch>
+        ```
 3. Install python dependencies
 ```bash
 cd SDC-System-Integration
