@@ -7,9 +7,10 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
   * 2 CPU
   * 2 GB system memory
   * 25 GB of free hard drive space
-__NOTE: *Have reports of poor performance using VM, so may not be the best path...*__
-  
+
   The Udacity provided virtual machine has ROS and Dataspeed DBW already installed, so you can skip the next two steps if you are using this.
+
+  __NOTE: *Have reports of poor performance using VM, so may not be the best path...*__
 
 * Follow these instructions to install ROS
   * [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu) if you have Ubuntu 16.04.
