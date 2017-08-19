@@ -35,6 +35,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 1. Clone the project repository
 ```bash
 git clone https://github.com/diyjac/SDC-System-Integration.git
+cd SDC-System-Integration
 ```
 2. List/Checkout/Create your own branch in the repository
     * list existing branches
@@ -52,7 +53,6 @@ git clone https://github.com/diyjac/SDC-System-Integration.git
         ```
 3. Install python dependencies
 ```bash
-cd SDC-System-Integration
 pip install -r requirements.txt
 ```
 4. Make and run styx
