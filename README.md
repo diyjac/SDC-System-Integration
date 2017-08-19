@@ -36,37 +36,46 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 ```bash
 git clone https://github.com/diyjac/SDC-System-Integration.git
 ```
-
-2. Install python dependencies
+2. OPTIONAL: Checkout/Create your branch in the repository
+    a. Create new branch from current branch
+        ```bash
+        git checkout -b <your branch>
+        git push -u origin <your branch>
+        ```
+    b. Switch to a different branch
+        ```bash
+        git checkout <different branch>
+        ```
+3. Install python dependencies
 ```bash
 cd SDC-System-Integration
 pip install -r requirements.txt
 ```
-3. Make and run styx
+4. Make and run styx
 ```bash
 cd ros
 catkin_make
 source devel/setup.bash
 roslaunch launch/styx.launch
 ```
-4. Run the simulator
+5. Run the simulator
 ```bash
 unzip lights_no_cars.zip
 cd lights_no_cars
 chmod +x ros_test.x86_64
 ./ros_test.x86_64
 ```
-5. To test grab a raw camera image
+6. To test grab a raw camera image
 ```bash
 rosrun tools grabFrontCameraImage.py ../imgs/sampleout.jpg
 ```
 ![./imgs/sampleout.jpg](./imgs/sampleout.jpg)
 
-6. To dump the waypoints from the `/base_waypoints` topic
+7. To dump the waypoints from the `/base_waypoints` topic
 ```bash
 rosrun tools dumpWaypoints.py ../data/simulator_waypoints.csv
 ```
-7. To dump the final waypoints from the `/final_waypoints` topic
+8. To dump the final waypoints from the `/final_waypoints` topic
 ```bash
 rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```
