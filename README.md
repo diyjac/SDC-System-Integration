@@ -62,9 +62,14 @@ rosrun tools grabFrontCameraImage.py ../imgs/sampleout.jpg
 ```
 ![./imgs/sampleout.jpg](./imgs/sampleout.jpg)
 
-6. To dump the waypoints from the simulator
+6. To dump the waypoints from the `/base_waypoints` topic
 ```bash
 rosrun tools dumpWaypoints.py ../data/simulator_waypoints.csv
 ```
+7. To dump the final waypoints from the `/final_waypoints` topic
+```bash
+rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
+```
+
 ![./imgs/sim_waypoint_map.png](./imgs/sim_waypoint_map.png)
 

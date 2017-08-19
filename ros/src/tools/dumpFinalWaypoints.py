@@ -15,7 +15,7 @@ class DumpWaypoints():
         # initialize and subscribe to the current position and waypoint base topic
         rospy.init_node('waypoint_grabber')
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        sub2 = rospy.Subscriber('/final_waypoints', Lane, self.waypoints_cb)
         self.pose = None
         self.waypoints = None
         self.outfile = outfile
@@ -38,13 +38,10 @@ class DumpWaypoints():
         """
         self.waypoints = msg
         if self.pose:
-            print "pose: "
-            print self.pose
             fieldname = ['x', 'y']
             log_file = open(self.outfile, 'w')
             log_writer = csv.DictWriter(log_file, fieldnames=fieldname)
             log_writer.writeheader()
-            log_writer.writerow({'x':self.pose.pose.position.x, 'y':self.pose.pose.position.y})
             for waypoint in msg.waypoints:
                 log_writer.writerow({'x':waypoint.pose.pose.position.x, 'y':waypoint.pose.pose.position.y})
             log_file.close()
@@ -54,7 +51,7 @@ class DumpWaypoints():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Udacity SDC System Integration, Waypoints Dumper')
-    parser.add_argument('outfile', type=str, help='Waypoint save file, first point is the starting point')
+    parser.add_argument('outfile', type=str, help='Final Waypoint save file, first point is the starting point')
     args = parser.parse_args()
 
     try:
