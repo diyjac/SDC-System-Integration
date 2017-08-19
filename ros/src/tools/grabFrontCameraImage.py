@@ -7,7 +7,8 @@ from geometry_msgs.msg import PoseStamped, Pose
 from styx_msgs.msg import TrafficLightArray, TrafficLight
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-import tf
+import tf2_ros
+import tf2_geometry_msgs
 import cv2
 import sys
 import numpy as np
@@ -26,8 +27,8 @@ class GrabFrontCameraImage():
         sub3 = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
 
         self.bridge = CvBridge()
-        self.listener = tf.TransformListener()
-
+        self.tfBuffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.tfBuffer)
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
@@ -38,17 +39,19 @@ class GrabFrontCameraImage():
     def traffic_cb(self, msg):
         self.lights = msg.lights
 
-    def project_to_image_plane(self, point_in_world):
+    def project_to_image_plane(self, pose):
         """Project point from 3D world coordinates to 2D camera image location
 
         Args:
-            point_in_world (Point): 3D location of a point in the world
+            pose (Point): 3D location of a point in the world
 
         Returns:
             x (int): x coordinate of target point in image
             y (int): y coordinate of target point in image
 
         """
+        point_in_world = pose.pose.position
+
         fx = config.camera_info.focal_length_x
         fy = config.camera_info.focal_length_y
 
@@ -58,22 +61,24 @@ class GrabFrontCameraImage():
         # get transform between pose of camera and world frame
         trans = None
         try:
-            now = rospy.Time.now()
-            self.listener.waitForTransform("/base_link",
-                  "/world", now, rospy.Duration(1.0))
-            (trans, rot) = self.listener.lookupTransform("/base_link",
-                  "/world", now)
+            transform =  self.tfBuffer.lookup_transform("base_link","world",rospy.Time(0),rospy.Duration(1.0))
 
-        except (tf.Exception, tf.LookupException, tf.ConnectivityException):
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rospy.logerr("Failed to find camera to map transform")
 
         #TODO Use tranform and rotation to calculate 2D position of light in image
+
+        trans = transform.transform.translation
+        rot = transform.transform.rotation
         print "trans: ", trans
         print "rot: ", rot
         wp = np.array([ point_in_world.x, point_in_world.y, point_in_world.z ])
-        print "point_in_world: ", (wp + trans)
+        #print "point_in_world: ", (wp + trans)
+
+        pose_transformed = tf2_geometry_msgs.do_transform_pose(pose,transform)
         
-        
+        print "pose_transformed: ", pose_transformed
+
         x = 0
         y = 0
         return (x, y)
@@ -88,7 +93,7 @@ class GrabFrontCameraImage():
             image with boxes around traffic lights
 
         """
-        (x,y) = self.project_to_image_plane(light.pose.pose.position)
+        (x,y) = self.project_to_image_plane(light.pose)
 
         # use light location to draw box around traffic light in image
         print "x, y:", x, y
@@ -108,8 +113,8 @@ class GrabFrontCameraImage():
             self.cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
             # TODO: experiment with drawing bounding boxes around traffic lights
-            # for light in self.lights:
-            #     self.draw_light_box(light)
+            for light in self.lights:
+                self.draw_light_box(light)
 
             cv2.imwrite(self.outfile, self.cv_image)
             rospy.signal_shutdown("grabbed image done.")
