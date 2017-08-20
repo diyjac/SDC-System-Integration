@@ -7,7 +7,7 @@ The following are the member of Team Vulture.
 
 * __Team Lead__: John Chen, diyjac@gmail.com
 * Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, __Needs attention__
+* Sebastian Trick, Sebastian.trick@gmail.com
 * Yuesong Xie, cedric_xie@hotmail.com
 * Kungfeng Chen, kunfengchen@live.com
 
