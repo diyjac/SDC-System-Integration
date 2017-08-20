@@ -12,6 +12,8 @@ import tf2_geometry_msgs
 import cv2
 import sys
 import numpy as np
+import image_geometry
+from sensor_msgs.msg import CameraInfo
 from traffic_light_config import config
 
 class GrabFrontCameraImage():
@@ -26,6 +28,9 @@ class GrabFrontCameraImage():
         sub2 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
         sub3 = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
 
+        self.pub = rospy.Publisher('/tl_debug', Image, queue_size=10)
+
+
         self.bridge = CvBridge()
         self.tfBuffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.tfBuffer)
@@ -38,6 +43,12 @@ class GrabFrontCameraImage():
 
     def traffic_cb(self, msg):
         self.lights = msg.lights
+
+
+    def transform_3d_2d(self, point):
+        x = 400 - 2560* config.camera_info.focal_length_x * point[0] / point[2]
+        y =   600 - 1280 * config.camera_info.focal_length_y * point[1] / point[2] 
+        return (x,y)
 
     def project_to_image_plane(self, pose):
         """Project point from 3D world coordinates to 2D camera image location
@@ -58,6 +69,9 @@ class GrabFrontCameraImage():
         image_width = config.camera_info.image_width
         image_height = config.camera_info.image_height
 
+
+
+
         # get transform between pose of camera and world frame
         trans = None
         try:
@@ -68,20 +82,26 @@ class GrabFrontCameraImage():
 
         #TODO Use tranform and rotation to calculate 2D position of light in image
 
-        trans = transform.transform.translation
-        rot = transform.transform.rotation
-        print "trans: ", trans
-        print "rot: ", rot
+      
         wp = np.array([ point_in_world.x, point_in_world.y, point_in_world.z ])
-        #print "point_in_world: ", (wp + trans)
 
         pose_transformed = tf2_geometry_msgs.do_transform_pose(pose,transform)
-        
-        print "pose_transformed: ", pose_transformed
+        point = pose_transformed.pose.position
 
-        x = 0
-        y = 0
-        return (x, y)
+        if(point.x > 0 and point.x < 200 and abs(point.y) < 200 ): #light is infront
+            print "point_in_world: ", wp
+            print "pose_transformed: ", pose_transformed.pose.position
+
+            point1 = np.array([point.y+1,point.z+1 ,point.x ])
+            point2 = np.array([point.y -1,point.z - 2 ,point.x ])
+
+            (x,y) = self.transform_3d_2d(point1)
+            (x1,y1) = self.transform_3d_2d(point2)
+
+            print "x, y:", x, y
+            return (x,y,x1,y1)
+        else:
+            return (-1,-1,-1,-1)
 
     def draw_light_box(self, light):
         """Draw boxes around traffic lights
@@ -93,11 +113,25 @@ class GrabFrontCameraImage():
             image with boxes around traffic lights
 
         """
-        (x,y) = self.project_to_image_plane(light.pose)
+        (x,y,x1,y1) = self.project_to_image_plane(light.pose)
 
         # use light location to draw box around traffic light in image
-        print "x, y:", x, y
 
+        x = int(x)
+        y = int(y)
+        x1 = int(x1)
+        y1 = int(y1)
+        if(x > 0 and y > 0 and x < config.camera_info.image_width and y < config.camera_info.image_height):
+
+            color = (0,0,0)
+            if(light.state == 0):
+                color = (0,0,255)
+            elif(light.state == 1):
+                color = (0,255,255)
+            elif(light.state == 2):
+                color = (0,255,0)
+            print "state:", light.state
+            cv2.rectangle(self.cv_image,(x, y),(x1,y1),color,3)
 
     def image_cb(self, msg):
         """Grab the first incoming camera image and saves it
@@ -115,10 +149,14 @@ class GrabFrontCameraImage():
             # TODO: experiment with drawing bounding boxes around traffic lights
             for light in self.lights:
                 self.draw_light_box(light)
+                
+            im_pub = self.bridge.cv2_to_imgmsg(self.cv_image)
+            self.pub.publish(im_pub)
+            #cv2.imwrite(self.outfile, self.cv_image)
 
-            cv2.imwrite(self.outfile, self.cv_image)
-            rospy.signal_shutdown("grabbed image done.")
-            sys.exit(0)
+
+            #rospy.signal_shutdown("grabbed image done.")
+            #sys.exit(0)
 
 
 if __name__ == "__main__":
