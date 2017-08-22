@@ -25,6 +25,11 @@ class GrabFrontCameraImage():
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
 
+        # test different raw image update rates:
+        # - 500 - 2 frames a second
+        # - 2000 - 1 frame every two seconds
+        self.updateRate = 2000
+
         self.bridge = CvBridge()
         self.listener = tf.TransformListener()
         self.camera_sub = None
@@ -78,10 +83,9 @@ class GrabFrontCameraImage():
         return dist
 
     def loop(self):
-        # only check once a second
+        # only check once a updateRate time in milliseconds...
         font = cv2.FONT_HERSHEY_COMPLEX
-        color = (192, 192, 192)
-        rate = rospy.Rate(500)
+        rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
             if self.theta is not None:
                 tl_dist = self.dist_to_next_traffic_light()
@@ -90,6 +94,7 @@ class GrabFrontCameraImage():
                         self.camera_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
                     else:
                         if self.img_rows is not None:
+                            color = (192, 192, 192)
                             self.cv_image = np.zeros((self.img_rows, self.img_cols, self.img_ch), dtype=np.uint8)
                             text1 = "Nearest Traffic Light (%d)..."
                             text2 = "is %fm ahead."
@@ -97,9 +102,11 @@ class GrabFrontCameraImage():
                             cv2.putText(self.cv_image, text2%(tl_dist), (100, self.img_rows//2), font, 1, color, 2)
                             self.update_pygame()
                 else:
-                    if tl_dist > 80:
+                    if tl_dist > 80 and self.camera_sub is not None:
                         self.camera_sub.unregister()
                         self.camera_sub = None
+            # schedule next loop
+            rate.sleep()
 
 
     def project_to_image_plane(self, point_in_world):
@@ -178,6 +185,10 @@ class GrabFrontCameraImage():
             msg (Image): image from car-mounted camera
 
         """
+        # unregister the subscriber to throttle the images coming in
+        if self.camera_sub is not None:
+            self.camera_sub.unregister()
+            self.camera_sub = None
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
@@ -188,6 +199,13 @@ class GrabFrontCameraImage():
             # for light in self.lights:
             #     self.draw_light_box(light)
 
+            color = (100, 0, 100)
+            font = cv2.FONT_HERSHEY_COMPLEX
+            text1 = "Nearest Traffic Light (%d)..."
+            text2 = "is %fm ahead."
+            tl_dist = self.dist_to_next_traffic_light()
+            cv2.putText(self.cv_image, text1%(self.ctl), (100, height-120), font, 1, color, 2)
+            cv2.putText(self.cv_image, text2%(tl_dist), (100, height-60), font, 1, color, 2)
             self.update_pygame()
 
 

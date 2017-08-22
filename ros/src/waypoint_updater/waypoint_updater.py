@@ -30,8 +30,8 @@ class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
-        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        self.sub_base_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
         # NOTE: comment out until we get traffic lights working...
@@ -100,6 +100,9 @@ class WaypointUpdater(object):
             # make sure we wrap!
             self.waypoints.append(msg.waypoints[0])
             self.waypoints.append(msg.waypoints[1])
+
+            # unregister the subscription - we only need it once.
+            self.sub_base_waypoints.unregister()
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
