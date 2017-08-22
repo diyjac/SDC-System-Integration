@@ -15,7 +15,7 @@ __GO VULTURE!__
 
 ### WAYPOINT UPDATER Experimental 1.
 
-* Test code for waypoint_updater.pyo, looks like the next set of node expects local coordinates instead of global.
+* Test code for waypoint_updater.py: looks like the ros node down stream expects local coordinates instead of global.
 * Add pygame joystick control to dbw_node.py to observe vehicle behavior on different throttle, brake and steering inputs.
 
 ### Installation 
