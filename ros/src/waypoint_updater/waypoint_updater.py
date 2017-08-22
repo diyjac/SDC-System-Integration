@@ -5,6 +5,7 @@ import tf
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 import numpy as np
+import copy
 
 import math
 
@@ -30,8 +31,8 @@ class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
-        self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        self.sub_base_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
         # NOTE: comment out until we get traffic lights working...
@@ -45,6 +46,7 @@ class WaypointUpdater(object):
         self.theta = None
         self.waypoints = None
         self.cwp = None
+        self.i = 0
 
         rospy.spin()
 
@@ -69,24 +71,73 @@ class WaypointUpdater(object):
 
     def getWaypoints(self, number):
         self.final_waypoints = []
+        vptsx = []
+        vptsy = []
         wlen = len(self.waypoints)
+
+        # change to local coordinates
         for i in range(number):
-            self.final_waypoints.append(self.waypoints[(i+self.cwp)%wlen])
+            vx = self.waypoints[(i+self.cwp)%wlen].pose.pose.position.x - self.position.x
+            vy = self.waypoints[(i+self.cwp)%wlen].pose.pose.position.y - self.position.y
+            lx = vx*np.cos(self.theta) + vy*np.sin(self.theta)
+            ly = -vx*np.sin(self.theta) + vy*np.cos(self.theta)
+            vptsx.append(lx)
+            vptsy.append(ly)
+            p = Waypoint()
+            p.pose.pose.position.x = lx
+            p.pose.pose.position.y = ly
+            p.pose.pose.position.z = self.waypoints[(i+self.cwp)%wlen].pose.pose.position.z
+            p.pose.pose.orientation.x = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.x
+            p.pose.pose.orientation.y = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.y
+            p.pose.pose.orientation.z = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.z
+            p.pose.pose.orientation.w = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.w
+            p.twist.twist.linear.x = self.waypoints[(i+self.cwp)%wlen].twist.twist.linear.x
+            p.twist.twist.linear.y = self.waypoints[(i+self.cwp)%wlen].twist.twist.linear.y
+            p.twist.twist.linear.z = self.waypoints[(i+self.cwp)%wlen].twist.twist.linear.z
+            p.twist.twist.angular.x = self.waypoints[(i+self.cwp)%wlen].twist.twist.angular.x
+            p.twist.twist.angular.y = self.waypoints[(i+self.cwp)%wlen].twist.twist.angular.y
+            p.twist.twist.angular.z = self.waypoints[(i+self.cwp)%wlen].twist.twist.angular.z
+            self.final_waypoints.append(p)
+
+        # calculate cross track error (cte)
+        poly = np.polyfit(np.array(vptsx), np.array(vptsy), 3)
+        polynomial = np.poly1d(poly)
+        self.cte = polynomial([0.])[0]
+        print "position:", self.position
+        print ""
+        print "cwp+g:", self.waypoints[self.cwp]
+        print "cwp+l:", self.final_waypoints[0]
+        print "cte:", self.cte
+        print ""
+            
+        # update twist
+        #for i in range(number-1):
+        #    x = self.final_waypoints[i].pose.pose.position.x
+        #    y = self.final_waypoints[i].pose.pose.position.y
+        #    self.final_waypoints[i].twist.twist.linear.x = 0.5
+        #    self.final_waypoints[i].twist.twist.linear.y = 0.
+        #    self.final_waypoints[i].twist.twist.linear.z = 0.
+        #    # self.final_waypoints[i].twist.twist.angular.x = 0.
+        #    # self.final_waypoints[i].twist.twist.angular.y = 0.
+        self.final_waypoints[i].twist.twist.angular.z = np.arctan2(polynomial([10.])[0], 10.)
 
     def pose_cb(self, msg):
         # DONE: Implement
+        self.i += 1
         self.pose = msg
-        self.position = self.pose.pose.position
+        self.position = msg.pose.position
+        self.orientation = msg.pose.orientation
         euler = tf.transformations.euler_from_quaternion([
-            self.pose.pose.orientation.x,
-            self.pose.pose.orientation.y,
-            self.pose.pose.orientation.z,
-            self.pose.pose.orientation.w])
+            self.orientation.x,
+            self.orientation.y,
+            self.orientation.z,
+            self.orientation.w])
         self.theta = euler[2]
         
         if self.waypoints:
             self.nextWaypoint()
-            print "self.cwp:", self.cwp
+            print self.i, "self.cwp:", self.cwp
+            print ""
             self.getWaypoints(LOOKAHEAD_WPS)
             self.publish()
 
@@ -100,9 +151,6 @@ class WaypointUpdater(object):
             # make sure we wrap!
             self.waypoints.append(msg.waypoints[0])
             self.waypoints.append(msg.waypoints[1])
-
-            # unregister the subscription - we only need it once.
-            self.sub_base_waypoints.unregister()
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
