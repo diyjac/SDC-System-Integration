@@ -13,6 +13,11 @@ The following are the member of Team Vulture.
 
 __GO VULTURE!__
 
+### WAYPOINT UPDATER Experimental 1.
+
+* Test code for waypoint_updater.pyo, looks like the next set of node expects local coordinates instead of global.
+* Add pygame joystick control to dbw_node.py to observe vehicle behavior on different throttle, brake and steering inputs.
+
 ### Installation 
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop). 
