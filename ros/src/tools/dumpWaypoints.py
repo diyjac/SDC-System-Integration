@@ -40,13 +40,30 @@ class DumpWaypoints():
         if self.pose:
             print "pose: "
             print self.pose
-            fieldname = ['x', 'y']
+            fieldname = ['x', 'y', 'z', 'ax', 'ay', 'az', 'aw']
             log_file = open(self.outfile, 'w')
             log_writer = csv.DictWriter(log_file, fieldnames=fieldname)
             log_writer.writeheader()
-            log_writer.writerow({'x':self.pose.pose.position.x, 'y':self.pose.pose.position.y})
+            log_writer.writerow({
+                'x': self.pose.pose.position.x,
+                'y': self.pose.pose.position.y,
+                'z': self.pose.pose.position.z,
+                'ax': self.pose.pose.orientation.x,
+                'ay': self.pose.pose.orientation.y,
+		'az': self.pose.pose.orientation.z,
+                'aw': self.pose.pose.orientation.w
+                })
             for waypoint in msg.waypoints:
-                log_writer.writerow({'x':waypoint.pose.pose.position.x, 'y':waypoint.pose.pose.position.y})
+                log_writer.writerow({
+                'x': waypoint.pose.pose.position.x,
+                'y': waypoint.pose.pose.position.y,
+                'z': waypoint.pose.pose.position.z,
+                'ax': waypoint.pose.pose.orientation.x,
+                'ay': waypoint.pose.pose.orientation.y,
+		'az': waypoint.pose.pose.orientation.z,
+                'aw': waypoint.pose.pose.orientation.w
+                })
+
             log_file.close()
             rospy.signal_shutdown("dump waypoint done.")
             sys.exit(0)

@@ -7,11 +7,16 @@ The following are the member of Team Vulture.
 
 * __Team Lead__: John Chen, diyjac@gmail.com
 * Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, __Needs attention__
+* Sebastian Trick, sebastian.trick@gmail.com
 * Yuesong Xie, cedric_xie@hotmail.com
 * Kungfeng Chen, kunfengchen@live.com
 
 __GO VULTURE!__
+
+### WAYPOINT UPDATER Experimental 1.
+
+* Test code for waypoint_updater.py: looks like the ros node down stream expects local coordinates instead of global.
+* Add pygame joystick control to dbw_node.py to observe vehicle behavior on different throttle, brake and steering inputs.
 
 ### Installation 
 
@@ -30,6 +35,9 @@ __GO VULTURE!__
   * [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu) if you have Ubuntu 14.04.
   * [Dataspeed DBW](https://bitbucket.org/DataspeedInc/dbw_mkz_ros)
   * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
+
+* Download the [Udacity Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/v0.1).
+
     __NOTE__: *If you are installing in native Ubuntu 16.04, the Dataspeed DBW One Line SDK binary install will auto install 4.4.0-92-generic Linux kernel, which will break CUDA and the NVIDIA 375 drivers if you have NVIDIA GPU in your native Ubuntu 16.04 build.  This will cause starting the simulator to fail because it can no longer open the OpenGL drivers provided by NVIDIA:*
 
     ![starting simulator failure image](./imgs/sim_startup_failure_caused_by_4.4.0-92-generic_kernel.png)
@@ -43,8 +51,6 @@ __GO VULTURE!__
 
         [https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics](https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics)
     
-* Download the [Udacity Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/v0.1).
-
 ### Usage
 
 1. Clone the project repository
@@ -104,10 +110,10 @@ rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```
 ![./imgs/sim_waypoint_map.png](./imgs/sim_waypoint_map.png)
 
-9. To view the front camera in real-time from the simulator
+9. To view the diagnostics screen in real-time when the integrated system is running
 * __NOTE__: Requires pygame!
 ```bash
-rosrun tools viewFrontCamera.py
+rosrun tools diagScreen.py
 ```
-![./imgs/front-camera-viewer.png](./imgs/sdc-t3-sysint-front-camera-viewer.gif)
+![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-t3-sysint-diag-screen.png)
 
