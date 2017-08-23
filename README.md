@@ -110,10 +110,10 @@ rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```
 ![./imgs/sim_waypoint_map.png](./imgs/sim_waypoint_map.png)
 
-9. To view the front camera in real-time from the simulator
+9. To view the diagnostics screen in real-time when the integrated system is running
 * __NOTE__: Requires pygame!
 ```bash
-rosrun tools viewFrontCamera.py
+rosrun tools diagScreen.py
 ```
-![./imgs/front-camera-viewer.png](./imgs/sdc-t3-sysint-front-camera-viewer.gif)
+![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-t3-sysint-diag-screen.png)
 

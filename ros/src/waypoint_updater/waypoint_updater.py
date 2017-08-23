@@ -42,14 +42,39 @@ class WaypointUpdater(object):
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # DONE: Add other member variables you need below
+        self.updateRate = 2 # update 2 times a second
         self.pose = None
         self.theta = None
         self.waypoints = None
         self.cwp = None
         self.i = 0
 
-        rospy.spin()
+        self.loop()
 
+    def loop(self):
+        rate = rospy.Rate(self.updateRate)
+        while not rospy.is_shutdown():
+            if self.waypoints and self.theta:
+                self.nextWaypoint()
+                print self.i, "self.cwp:", self.cwp
+                print ""
+                self.getWaypoints(LOOKAHEAD_WPS)
+                self.publish()
+        rate.sleep()
+
+    def pose_cb(self, msg):
+        # DONE: Implement
+        self.i += 1
+        self.pose = msg
+        self.position = msg.pose.position
+        self.orientation = msg.pose.orientation
+        euler = tf.transformations.euler_from_quaternion([
+            self.orientation.x,
+            self.orientation.y,
+            self.orientation.z,
+            self.orientation.w])
+        self.theta = euler[2]
+        
     def nextWaypoint(self):
         dist = 100000.
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
@@ -83,63 +108,16 @@ class WaypointUpdater(object):
             ly = -vx*np.sin(self.theta) + vy*np.cos(self.theta)
             vptsx.append(lx)
             vptsy.append(ly)
-            p = Waypoint()
-            p.pose.pose.position.x = lx
-            p.pose.pose.position.y = ly
-            p.pose.pose.position.z = self.waypoints[(i+self.cwp)%wlen].pose.pose.position.z
-            p.pose.pose.orientation.x = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.x
-            p.pose.pose.orientation.y = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.y
-            p.pose.pose.orientation.z = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.z
-            p.pose.pose.orientation.w = self.waypoints[(i+self.cwp)%wlen].pose.pose.orientation.w
-            p.twist.twist.linear.x = self.waypoints[(i+self.cwp)%wlen].twist.twist.linear.x
-            p.twist.twist.linear.y = self.waypoints[(i+self.cwp)%wlen].twist.twist.linear.y
-            p.twist.twist.linear.z = self.waypoints[(i+self.cwp)%wlen].twist.twist.linear.z
-            p.twist.twist.angular.x = self.waypoints[(i+self.cwp)%wlen].twist.twist.angular.x
-            p.twist.twist.angular.y = self.waypoints[(i+self.cwp)%wlen].twist.twist.angular.y
-            p.twist.twist.angular.z = self.waypoints[(i+self.cwp)%wlen].twist.twist.angular.z
-            self.final_waypoints.append(p)
+            self.final_waypoints.append(self.waypoints[(i+self.cwp)%wlen])
 
         # calculate cross track error (cte)
         poly = np.polyfit(np.array(vptsx), np.array(vptsy), 3)
         polynomial = np.poly1d(poly)
-        self.cte = polynomial([0.])[0]
-        print "position:", self.position
-        print ""
-        print "cwp+g:", self.waypoints[self.cwp]
-        print "cwp+l:", self.final_waypoints[0]
-        print "cte:", self.cte
-        print ""
-            
-        # update twist
-        #for i in range(number-1):
-        #    x = self.final_waypoints[i].pose.pose.position.x
-        #    y = self.final_waypoints[i].pose.pose.position.y
-        #    self.final_waypoints[i].twist.twist.linear.x = 0.5
-        #    self.final_waypoints[i].twist.twist.linear.y = 0.
-        #    self.final_waypoints[i].twist.twist.linear.z = 0.
-        #    # self.final_waypoints[i].twist.twist.angular.x = 0.
-        #    # self.final_waypoints[i].twist.twist.angular.y = 0.
-        self.final_waypoints[i].twist.twist.angular.z = np.arctan2(polynomial([10.])[0], 10.)
-
-    def pose_cb(self, msg):
-        # DONE: Implement
-        self.i += 1
-        self.pose = msg
-        self.position = msg.pose.position
-        self.orientation = msg.pose.orientation
-        euler = tf.transformations.euler_from_quaternion([
-            self.orientation.x,
-            self.orientation.y,
-            self.orientation.z,
-            self.orientation.w])
-        self.theta = euler[2]
-        
-        if self.waypoints:
-            self.nextWaypoint()
-            print self.i, "self.cwp:", self.cwp
-            print ""
-            self.getWaypoints(LOOKAHEAD_WPS)
-            self.publish()
+        mps = 0.44704
+        for i in range(len(vptsx)):
+            cte = polynomial([vptsx[i]])[0]
+            self.final_waypoints[i].twist.twist.linear.x = mps*25.
+            self.final_waypoints[i].twist.twist.angular.z = cte
 
     def waypoints_cb(self, msg):
         # DONE: Implement
@@ -148,9 +126,19 @@ class WaypointUpdater(object):
             for waypoint in msg.waypoints:
                 self.waypoints.append(waypoint)
 
-            # make sure we wrap!
+            # make sure we wrap and correct for angles!
+            lastx = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            lasty = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
             self.waypoints.append(msg.waypoints[0])
+            x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
+            lastx = x
+            lasty = y
             self.waypoints.append(msg.waypoints[1])
+            x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement

@@ -26,9 +26,9 @@ class GrabFrontCameraImage():
         sub2 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
 
         # test different raw image update rates:
-        # - 500 - 2 frames a second
-        # - 2000 - 1 frame every two seconds
-        self.updateRate = 2000
+        # - 2   - 2 frames a second
+        # - 0.5 - 1 frame every two seconds
+        self.updateRate = 2
 
         self.bridge = CvBridge()
         self.listener = tf.TransformListener()

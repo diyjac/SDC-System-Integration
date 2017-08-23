@@ -9,9 +9,9 @@ import math
 from twist_controller import Controller
 from yaw_controller import YawController
 
-import pygame
-pygame.init()
-pygame.joystick.init()
+#import pygame
+#pygame.init()
+#pygame.joystick.init()
 
 '''
 You can build this node only after you have built (or partially built) the `waypoint_updater` node.
@@ -50,7 +50,7 @@ class DBWNode(object):
         self.steer_ratio = rospy.get_param('~steer_ratio', 14.8)
         self.max_lat_accel = rospy.get_param('~max_lat_accel', 3.)
         self.max_steer_angle = rospy.get_param('~max_steer_angle', 8.)
-        self.min_speed = rospy.get_param('~min_speed', 0.)
+        self.min_speed = rospy.get_param('~min_speed', 4.*0.44704)
 
         self.steer_pub = rospy.Publisher('/vehicle/steering_cmd',
                                          SteeringCmd, queue_size=1)
@@ -94,21 +94,25 @@ class DBWNode(object):
             #                                                     <current linear velocity>,
             #                                                     <dbw status>,
             #                                                     <any other argument you need>)
-            for event in pygame.event.get():
-                continue
-            self.joystick = pygame.joystick.Joystick(0)
-            self.joystick.init()
-            steer = -self.joystick.get_axis(0)
-            throttle = self.joystick.get_axis(1) * 100.
+            #for event in pygame.event.get():
+            #    continue
+            #self.joystick = pygame.joystick.Joystick(0)
+            #self.joystick.init()
+            #steer = -self.joystick.get_axis(0)
+            #throttle = self.joystick.get_axis(1) + .3
             brake = 0.
-            if throttle < 0.:
-                brake = -throttle
-                throttle = 0.
-            # steer = -self.controller.get_steering(self.linear_velocity, self.angular_velocity, self.current_velocity)
+            #if throttle < 0.:
+            #    brake = -throttle
+            #    throttle = 0.
+            throttle = 0.5
+            # steer = self.controller.get_steering(self.linear_velocity, self.angular_velocity, self.current_velocity)
+            # steer = (self.controller.get_steering(self.linear_velocity, self.angular_velocity, self.current_velocity) + (self.angular_velocity - self.current_angular_velocity))
+            steer = (self.angular_velocity - self.current_angular_velocity) * self.steer_ratio
             print "steer:", steer
             
             if self.dbw_enabled:
                 self.publish(throttle, brake, steer)
+                # self.publish(throttle, brake, -0.04)
             #else:
             #    # disabled!  Recreate/reset controller
             #    self.controller = TwistController(
