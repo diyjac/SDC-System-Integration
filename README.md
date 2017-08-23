@@ -13,6 +13,10 @@ The following are the member of Team Vulture.
 
 __GO VULTURE!__
 
+### WAYPOINT Experimental 2 - CPP
+
+Experiment with CPP version of waypoint updater using path planner C++ code from Term3 project 1.
+
 ### Installation 
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop). 
