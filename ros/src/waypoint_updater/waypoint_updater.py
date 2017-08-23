@@ -5,6 +5,7 @@ import tf
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 import numpy as np
+import copy
 
 import math
 
@@ -30,8 +31,8 @@ class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
-        self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        self.sub_base_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
         # NOTE: comment out until we get traffic lights working...
@@ -41,13 +42,39 @@ class WaypointUpdater(object):
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # DONE: Add other member variables you need below
+        self.updateRate = 2 # update 2 times a second
         self.pose = None
         self.theta = None
         self.waypoints = None
         self.cwp = None
+        self.i = 0
 
-        rospy.spin()
+        self.loop()
 
+    def loop(self):
+        rate = rospy.Rate(self.updateRate)
+        while not rospy.is_shutdown():
+            if self.waypoints and self.theta:
+                self.nextWaypoint()
+                print self.i, "self.cwp:", self.cwp
+                print ""
+                self.getWaypoints(LOOKAHEAD_WPS)
+                self.publish()
+        rate.sleep()
+
+    def pose_cb(self, msg):
+        # DONE: Implement
+        self.i += 1
+        self.pose = msg
+        self.position = msg.pose.position
+        self.orientation = msg.pose.orientation
+        euler = tf.transformations.euler_from_quaternion([
+            self.orientation.x,
+            self.orientation.y,
+            self.orientation.z,
+            self.orientation.w])
+        self.theta = euler[2]
+        
     def nextWaypoint(self):
         dist = 100000.
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
@@ -69,26 +96,28 @@ class WaypointUpdater(object):
 
     def getWaypoints(self, number):
         self.final_waypoints = []
+        vptsx = []
+        vptsy = []
         wlen = len(self.waypoints)
+
+        # change to local coordinates
         for i in range(number):
+            vx = self.waypoints[(i+self.cwp)%wlen].pose.pose.position.x - self.position.x
+            vy = self.waypoints[(i+self.cwp)%wlen].pose.pose.position.y - self.position.y
+            lx = vx*np.cos(self.theta) + vy*np.sin(self.theta)
+            ly = -vx*np.sin(self.theta) + vy*np.cos(self.theta)
+            vptsx.append(lx)
+            vptsy.append(ly)
             self.final_waypoints.append(self.waypoints[(i+self.cwp)%wlen])
 
-    def pose_cb(self, msg):
-        # DONE: Implement
-        self.pose = msg
-        self.position = self.pose.pose.position
-        euler = tf.transformations.euler_from_quaternion([
-            self.pose.pose.orientation.x,
-            self.pose.pose.orientation.y,
-            self.pose.pose.orientation.z,
-            self.pose.pose.orientation.w])
-        self.theta = euler[2]
-        
-        if self.waypoints:
-            self.nextWaypoint()
-            print "self.cwp:", self.cwp
-            self.getWaypoints(LOOKAHEAD_WPS)
-            self.publish()
+        # calculate cross track error (cte)
+        poly = np.polyfit(np.array(vptsx), np.array(vptsy), 3)
+        polynomial = np.poly1d(poly)
+        mps = 0.44704
+        for i in range(len(vptsx)):
+            cte = polynomial([vptsx[i]])[0]
+            self.final_waypoints[i].twist.twist.linear.x = mps*25.
+            self.final_waypoints[i].twist.twist.angular.z = cte
 
     def waypoints_cb(self, msg):
         # DONE: Implement
@@ -97,12 +126,19 @@ class WaypointUpdater(object):
             for waypoint in msg.waypoints:
                 self.waypoints.append(waypoint)
 
-            # make sure we wrap!
+            # make sure we wrap and correct for angles!
+            lastx = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            lasty = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
             self.waypoints.append(msg.waypoints[0])
+            x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
+            lastx = x
+            lasty = y
             self.waypoints.append(msg.waypoints[1])
-
-            # unregister the subscription - we only need it once.
-            self.sub_base_waypoints.unregister()
+            x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
