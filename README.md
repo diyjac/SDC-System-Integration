@@ -115,5 +115,5 @@ rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```bash
 rosrun tools diagScreen.py
 ```
-![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-t3-sysint-diag-screen.png)
+![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-sysint-diagnostics.gif)
 
