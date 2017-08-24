@@ -7,7 +7,6 @@ from geometry_msgs.msg import TwistStamped
 import math
 
 from twist_controller import Controller
-from yaw_controller import YawController
 
 #import pygame
 #pygame.init()
@@ -68,11 +67,7 @@ class DBWNode(object):
         self.angular_velocity = 0.
 
         # TODO: Create `TwistController` object
-        #self.controller = TwistController(
-        #    self.wheel_base, self.steer_ratio, self.min_speed,
-        #    self.max_lat_accel, self.max_steer_angle)
-
-        self.controller = YawController(
+        self.controller = Controller(
             self.wheel_base, self.steer_ratio, self.min_speed,
             self.max_lat_accel, self.max_steer_angle)
 
@@ -89,39 +84,12 @@ class DBWNode(object):
         while not rospy.is_shutdown():
             # TODO: Get predicted throttle, brake, and steering using `twist_controller`
             # You should only publish the control commands if dbw is enabled
-            # throttle, brake, steering = self.controller.control(<proposed linear velocity>,
-            #                                                     <proposed angular velocity>,
-            #                                                     <current linear velocity>,
-            #                                                     <dbw status>,
-            #                                                     <any other argument you need>)
-            #for event in pygame.event.get():
-            #    continue
-            #self.joystick = pygame.joystick.Joystick(0)
-            #self.joystick.init()
-            #steer = -self.joystick.get_axis(0)
-            #throttle = self.joystick.get_axis(1) + .3
-            brake = 0.
-            #if throttle < 0.:
-            #    brake = -throttle
-            #    throttle = 0.
-            throttle = 0.5
-            # steer = self.controller.get_steering(self.linear_velocity, self.angular_velocity, self.current_velocity)
-            # steer = (self.controller.get_steering(self.linear_velocity, self.angular_velocity, self.current_velocity) + (self.angular_velocity - self.current_angular_velocity))
-            steer = (self.angular_velocity - self.current_angular_velocity) * self.steer_ratio
-            print "steer:", steer
-            
+            throttle, brake, steering = self.controller.control(self.linear_velocity,
+                                                                self.angular_velocity,
+                                                                self.current_linear_velocity,
+                                                                self.dbw_enabled)
             if self.dbw_enabled:
-                self.publish(throttle, brake, steer)
-                # self.publish(throttle, brake, -0.04)
-            #else:
-            #    # disabled!  Recreate/reset controller
-            #    self.controller = TwistController(
-            #        self.wheel_base, self.steer_ratio, self.min_speed,
-            #        self.max_lat_accel, self.max_steer_angle)
-            #    self.current_velocity = 0.
-            #    self.linear_velocity = 0.
-            #    self.angular_velocity = 0.
-
+                self.publish(throttle, brake, steering)
             rate.sleep()
 
     def dbw_enabled_cb(self, msg):

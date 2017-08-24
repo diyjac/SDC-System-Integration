@@ -1,6 +1,6 @@
 ## Udacity Self Driving Car Nanodegree Final Project: System Integration
 
-This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.
+This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
 
 ### The Team
 The following are the member of Team Vulture.
@@ -12,11 +12,6 @@ The following are the member of Team Vulture.
 * Kungfeng Chen, kunfengchen@live.com
 
 __GO VULTURE!__
-
-### WAYPOINT UPDATER Experimental 1.
-
-* Test code for waypoint_updater.py: looks like the ros node down stream expects local coordinates instead of global.
-* Add pygame joystick control to dbw_node.py to observe vehicle behavior on different throttle, brake and steering inputs.
 
 ### Installation 
 

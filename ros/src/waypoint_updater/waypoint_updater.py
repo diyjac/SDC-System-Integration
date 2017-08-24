@@ -42,6 +42,7 @@ class WaypointUpdater(object):
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # DONE: Add other member variables you need below
+        self.restricted_speed = 10. # mph
         self.updateRate = 2 # update 2 times a second
         self.pose = None
         self.theta = None
@@ -49,9 +50,12 @@ class WaypointUpdater(object):
         self.cwp = None
         self.i = 0
 
+        # start the loop
         self.loop()
 
     def loop(self):
+        # remove 1 mph for safety margin...
+        self.restricted_speed -= 1.0
         rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
             if self.waypoints and self.theta:
@@ -65,16 +69,16 @@ class WaypointUpdater(object):
     def pose_cb(self, msg):
         # DONE: Implement
         self.i += 1
-        self.pose = msg
-        self.position = msg.pose.position
-        self.orientation = msg.pose.orientation
+        self.pose = msg.pose
+        self.position = self.pose.position
+        self.orientation = self.pose.orientation
         euler = tf.transformations.euler_from_quaternion([
             self.orientation.x,
             self.orientation.y,
             self.orientation.z,
             self.orientation.w])
         self.theta = euler[2]
-        
+
     def nextWaypoint(self):
         dist = 100000.
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
@@ -110,35 +114,49 @@ class WaypointUpdater(object):
             vptsy.append(ly)
             self.final_waypoints.append(self.waypoints[(i+self.cwp)%wlen])
 
-        # calculate cross track error (cte)
+        # calculate cross track error (cte) + current lateral acceleration
         poly = np.polyfit(np.array(vptsx), np.array(vptsy), 3)
         polynomial = np.poly1d(poly)
         mps = 0.44704
         for i in range(len(vptsx)):
             cte = polynomial([vptsx[i]])[0]
-            self.final_waypoints[i].twist.twist.linear.x = mps*25.
+            if self.final_waypoints[i].twist.twist.linear.x < 0.:
+                self.final_waypoints[i].twist.twist.linear.x += 100.
             self.final_waypoints[i].twist.twist.angular.z = cte
 
     def waypoints_cb(self, msg):
         # DONE: Implement
+        mps = 0.44704
         if self.waypoints is None:
             self.waypoints = []
             for waypoint in msg.waypoints:
+                waypoint.twist.twist.linear.x = mps*self.restricted_speed
                 self.waypoints.append(waypoint)
 
+            wlen = len(self.waypoints)
+            # gradually zero out the last 210 waypoints (negative flag)
+            for i in range(200):
+                self.waypoints[wlen-10-i].twist.twist.linear.x = -100. + mps*self.restricted_speed*(i/200)
+            # zero out the last 10 waypoints
+            for i in range(10):
+                self.waypoints[wlen-1-i].twist.twist.linear.x = -100.
+
+            # NOTE: Per Yousuf Fauzan, we should STOP at last waypoint, so commenting out
+            #       the following code to do the wrap around for a looped course.
+            #
             # make sure we wrap and correct for angles!
-            lastx = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
-            lasty = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
-            self.waypoints.append(msg.waypoints[0])
-            x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
-            y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
-            self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
-            lastx = x
-            lasty = y
-            self.waypoints.append(msg.waypoints[1])
-            x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
-            y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
-            self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
+            # lastx = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            # lasty = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            # self.waypoints.append(msg.waypoints[0])
+            # x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            # y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            # self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
+            # lastx = x
+            # lasty = y
+            # self.waypoints.append(msg.waypoints[1])
+            # x = self.waypoints[len(msg.waypoints)-1].pose.pose.position.x
+            # y = self.waypoints[len(msg.waypoints)-1].pose.pose.position.y
+            # self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
