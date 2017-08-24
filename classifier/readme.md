@@ -83,6 +83,18 @@ Description see 4.1 deadends.
 
 It contains all data preparation and a NOT working version of squeeze net. NEEDS ATTENTION!!!
 
+|no. |lr    | batch | images | model     | Opt.    | epochs | s/epoch | loss           acc        | test acc. |   
+|:--:|:----:|:-----:|:------:|:---------:|:-------:|:------:|:-------:|:-----------------:|:--------:| 
+| 001 |--- |   64  |  all    | get_model | RMSPROP | 25      |600s    | loss: 0.25   - acc: 0.85,  |>>> 44%|
+| 002 |0.0001| 64  |  2000   | get_model | SGD     | 25      | 50s    | loss: 0.3328 - acc: 0.8896 |>>> 42.4%|
+|003 |0.001 | 64   | 2000   | get_model | SGD     | 25     |  50s    | loss: 0.1373 - acc: 0.9585 | >>> 48.4% / 49.6%|
+|004 |0.001 | 16   | 2000   | get_model | SGD     | 25     |  80s    | loss: 0.1613 - acc: 0.9545 |>>> 47.5% / 50.1%|
+|005| 0.001 | 128  | 2000   | get_model | SGD     | 25     |  50s    | loss: 0.1627 - acc: 0.9521 |>>> 42.9%|
+|006 |0.005 | 64   | 2000   | get_model | SGD     | 25      | 50s    | loss: 0.1304 - acc: 0.9673 |>>> 44.3%|
+|007 |0.001 | 64    |all    | get_model | SGD     | 50     |  850s   | loss: 0.0919 - acc: 0.9737 |>>> 50.0% <<<|
+test accuracy is determined for predicting a completly unseen test dataset splitted from the original dataset
+
+
 ## 2.2 Using [Yolo v2](https://github.com/chrisgundling/yolo_light)
 
 ##### Testing on test traffic lights
