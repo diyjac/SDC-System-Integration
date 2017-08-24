@@ -72,6 +72,10 @@ These [images are cropped](https://github.com/cena0805/ros-traffic-light-classif
 | /test/unknown  | 5823    |                  |
 
 I believe the problem with this dataset is the high amount of data in the "unknown" class which will make the neural net learn a lot of unnecessary characteristics.
+S
+### 1.4 [Udacity Camera Feed](https://carnd.slack.com/archives/C6NVDVAQ3/p1503614726000196)
+
+Caleb Kirksey provided us with two bag files with an image feed from the Udacity self-driving car's camera in the test lot and a topic containing the car's position at [google drive](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing)
 
 ## 2. Neural Net Candidates
 
