@@ -22,10 +22,10 @@ It follows "pred.py":
     
     # load pretrained model 
     model = SqueezeNet(3, (IMAGE_HEIGHT, IMAGE_WIDTH, 3))
-    model.load_weights("trained_model/challenge1.weights")
+    model.load_weights("challenge1.weights")
     
     # predict image class
-    filepath = "./image_from_simulator/sampleout1.jpg"
+    filepath = "./02-image_from_simulator/sampleout1.jpg"
     image = load_img(filepath, target_size=(224,224))
     image = img_to_array(image)
     image /= 255.0
@@ -39,7 +39,9 @@ It follows "pred.py":
     # 1: red light
     # 2: green light
     
-I guess we have to train our own model which can be done in the meantime and tweaking the hyper parameters. 
+I guess we have to train our own model which can be done in the meantime together tweaking the hyper parameters. 
+
+###### Or are we allowed to use other models if we cite them properly?
 
 ## 1. Datasets
 
@@ -77,7 +79,9 @@ I believe the problem with this dataset is the high amount of data in the "unkno
 
 This is a small Jupiter notebook for testing the approach of [this ROS node] (https://github.com/cena0805/ros-traffic-light-classifier).
 
-It contains all data preparation and a NOR working version of squeeze net. NEEDS ATTENTION!!!
+Description see 4.1 deadends.
+
+It contains all data preparation and a NOT working version of squeeze net. NEEDS ATTENTION!!!
 
 ## 2.2 Using [Yolo v2](https://github.com/chrisgundling/yolo_light)
 
@@ -163,7 +167,52 @@ For completeness here the results:
 |:-------:|:-------:|:--------:|:-------:|:--------:|
 |for predictinon on test data| 50.83%| 50.17%  | 50.82%  | 51.15%   |
 
+The structure of the net is
 
+    ____________________________________________________________________________________________________
+    
+    Layer (type)                     Output Shape          Param #     Connected to                     
+    ====================================================================================================
+    convolution2d_5 (Convolution2D)  (None, 64, 64, 32)    896         convolution2d_input_6[0][0]      
+    ____________________________________________________________________________________________________
+    activation_7 (Activation)        (None, 64, 64, 32)    0           convolution2d_5[0][0]            
+    ____________________________________________________________________________________________________
+    convolution2d_6 (Convolution2D)  (None, 62, 62, 32)    9248        activation_7[0][0]               
+    ____________________________________________________________________________________________________
+    activation_8 (Activation)        (None, 62, 62, 32)    0           convolution2d_6[0][0]            
+    ____________________________________________________________________________________________________
+    maxpooling2d_3 (MaxPooling2D)    (None, 31, 31, 32)    0           activation_8[0][0]               
+    ____________________________________________________________________________________________________
+    dropout_4 (Dropout)              (None, 31, 31, 32)    0           maxpooling2d_3[0][0]             
+    ____________________________________________________________________________________________________
+    convolution2d_7 (Convolution2D)  (None, 31, 31, 64)    18496       dropout_4[0][0]                  
+    ____________________________________________________________________________________________________
+    activation_9 (Activation)        (None, 31, 31, 64)    0           convolution2d_7[0][0]            
+    ____________________________________________________________________________________________________
+    convolution2d_8 (Convolution2D)  (None, 29, 29, 64)    36928       activation_9[0][0]               
+    ____________________________________________________________________________________________________
+    activation_10 (Activation)       (None, 29, 29, 64)    0           convolution2d_8[0][0]            
+    ____________________________________________________________________________________________________
+    maxpooling2d_4 (MaxPooling2D)    (None, 14, 14, 64)    0           activation_10[0][0]              
+    ____________________________________________________________________________________________________
+    dropout_5 (Dropout)              (None, 14, 14, 64)    0           maxpooling2d_4[0][0]             
+    ____________________________________________________________________________________________________
+    flatten_2 (Flatten)              (None, 12544)         0           dropout_5[0][0]                  
+    ____________________________________________________________________________________________________
+    dense_3 (Dense)                  (None, 512)           6423040     flatten_2[0][0]                  
+    ____________________________________________________________________________________________________
+    activation_11 (Activation)       (None, 512)           0           dense_3[0][0]                    
+    ____________________________________________________________________________________________________
+    dropout_6 (Dropout)              (None, 512)           0           activation_11[0][0]              
+    ____________________________________________________________________________________________________
+    dense_4 (Dense)                  (None, 3)             1539        dropout_6[0][0]                  
+    ____________________________________________________________________________________________________
+    activation_12 (Activation)       (None, 3)             0           dense_4[0][0]                    
+    ====================================================================================================
+    Total params: 6,490,147
+    Trainable params: 6,490,147
+    Non-trainable params: 0
+    ____________________________________________________________________________________________________
 
 ## 5 Interesting Links
 [Rescale](http://www.rescale.com/?_ga=2.243752647.319079710.1503424790-1699517006.1503424790) a powerful cloud infrastructure e.g. for machine learning
