@@ -75,7 +75,11 @@ I believe the problem with this dataset is the high amount of data in the "unkno
 S
 ### 1.4 [Udacity Camera Feed](https://carnd.slack.com/archives/C6NVDVAQ3/p1503614726000196)
 
-Caleb Kirksey provided us with two bag files with an image feed from the Udacity self-driving car's camera in the test lot and a topic containing the car's position at [google drive](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing)
+https://drive.google.com/open?id=0B2_h37bMVw3iYkdJTlRSUlJIamM
+
+Caleb Kirksey provided us with two bag files with an image feed from the Udacity self-driving car's camera in the test lot and a topic containing the car's position at [google drive](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing).
+
+Caleb Kirksey: "The video has some shots of the traffic light that we'll be using in testing. I'll follow up with the relative location of the traffic light as well as more images of the light for training a neural net."
 
 ## 2. Neural Net Candidates
 
@@ -232,3 +236,5 @@ The structure of the net is
 
 ## 5 Interesting Links
 [Rescale](http://www.rescale.com/?_ga=2.243752647.319079710.1503424790-1699517006.1503424790) a powerful cloud infrastructure e.g. for machine learning
+
+[DenseNet on medium](https://medium.com/@ManishChablani/densenet-2810936aeebb?source=userActivityShare-5cf6967007c8-1503652277) and on [github](https://github.com/flyyufelix/DenseNet-Keras/blob/master/README.md)
