@@ -100,6 +100,10 @@ It contains all data preparation and a NOT working version of squeeze net. NEEDS
 |005| 0.001 | 128  | 2000   | get_model | SGD     | 25     |  50s    | loss: 0.1627 - acc: 0.9521 |>>> 42.9%|
 |006 |0.005 | 64   | 2000   | get_model | SGD     | 25      | 50s    | loss: 0.1304 - acc: 0.9673 |>>> 44.3%|
 |007 |0.001 | 64    |all    | get_model | SGD     | 50     |  850s   | loss: 0.0919 - acc: 0.9737 |>>> 50.0% <<<|
+| 008 |0.001 | 64  |  2000   | squeezze  | Adam     | 3     |   380s   | loss: 0.7187 - acc: 0.7310 | 51.2% / 54.8|
+| 009| 0.01 |  64   | 2000   | squeezze  | Adam     | 3     |   371s   | loss: 5.7216 - acc: 0.6450 | 67.0%|
+
+
 test accuracy is determined for predicting a completly unseen test dataset splitted from the original dataset
 
 
