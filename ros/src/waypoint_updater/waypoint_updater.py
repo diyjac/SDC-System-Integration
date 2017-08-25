@@ -2,12 +2,13 @@
 
 import rospy
 import tf
-from geometry_msgs.msg import PoseStamped
-from styx_msgs.msg import Lane, Waypoint
+from geometry_msgs.msg import TwistStamped, PoseStamped
+from styx_msgs.msg import TrafficLightArray, TrafficLight, Lane, Waypoint
 import numpy as np
 import copy
 
 import math
+from traffic_light_config import config
 
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
@@ -26,12 +27,20 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
 
+# states
+STOP = 0
+STOPPING = 1
+SLOWING = 2
+GO = 3
+GOGO = 4
+
 
 class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
@@ -39,27 +48,35 @@ class WaypointUpdater(object):
         # rospy.Subscriber('/traffic_waypoint', Waypoint, self.traffic_cb)
         # rospy.Subscriber('/obstacle_waypoint', Waypoint, self.obstacle_cb)
 
+        # TODO: For testing - comment out when we have /traffic_waypoint working...
+        rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
+
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # DONE: Add other member variables you need below
-        self.restricted_speed = 10. # mph
+        # self.restricted_speed = 10. # mph
+        self.restricted_speed = 9.5 # mph
+        self.current_linear_velocity = 0.
+        self.current_angular_velocity = 0.
+        self.lights = []
         self.updateRate = 2 # update 2 times a second
         self.pose = None
         self.theta = None
         self.waypoints = None
         self.cwp = None
         self.i = 0
+        self.state = STOP
 
         # start the loop
         self.loop()
 
     def loop(self):
-        # remove 1 mph for safety margin...
+        # remove 1.0 mph for safety margin...
         self.restricted_speed -= 1.0
         rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
             if self.waypoints and self.theta:
-                self.nextWaypoint()
+                self.cwp = self.nextWaypoint()
                 print self.i, "self.cwp:", self.cwp
                 print ""
                 self.getWaypoints(LOOKAHEAD_WPS)
@@ -79,24 +96,54 @@ class WaypointUpdater(object):
             self.orientation.w])
         self.theta = euler[2]
 
-    def nextWaypoint(self):
+    def velocity_cb(self, msg):
+        self.current_linear_velocity = msg.twist.linear.x
+        self.current_angular_velocity = msg.twist.angular.z
+        if self.current_linear_velocity == 0.:
+            self.state = STOP
+
+    def nextWaypoint(self, location=None):
+        if location is None:
+            location = self.position
         dist = 100000.
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
         cwp = 0
         for i in range(len(self.waypoints)):
-            d1 = dl(self.position, self.waypoints[i].pose.pose.position)
+            d1 = dl(location, self.waypoints[i].pose.pose.position)
             if dist > d1:
                 cwp = i
                 dist = d1
         x = self.waypoints[cwp].pose.pose.position.x
         y = self.waypoints[cwp].pose.pose.position.y
-        heading = np.arctan2((y-self.position.y), (x-self.position.x))
+        heading = np.arctan2((y-location.y), (x-location.x))
         angle = np.abs(self.theta-heading)
         if angle > np.pi/4.:
             cwp += 1
             if cwp >= len(self.waypoints):
                 cwp = 0
-        self.cwp = cwp
+        return cwp
+
+    def distanceToNextTrafficLight(self):
+        mps = 0.44704
+        dist = 100000.
+        dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
+        ctl = 0
+        for i in range(len(config.light_positions)):
+            d1 = dl(self.position, config.light_positions[i])
+            if dist > d1:
+                ctl = i
+                dist = d1
+        x = config.light_positions[ctl][0]
+        y = config.light_positions[ctl][1]
+        heading = np.arctan2((y-self.position.y), (x-self.position.x))
+        angle = np.abs(self.theta-heading)
+        if angle > np.pi/4.:
+            ctl += 1
+            if ctl >= len(config.light_positions):
+                ctl = 0
+            dist = dl(self.position, config.light_positions[ctl])
+        self.ctl = ctl
+        return dl(self.position, config.light_positions[self.ctl])
 
     def getWaypoints(self, number):
         self.final_waypoints = []
@@ -118,11 +165,80 @@ class WaypointUpdater(object):
         poly = np.polyfit(np.array(vptsx), np.array(vptsy), 3)
         polynomial = np.poly1d(poly)
         mps = 0.44704
-        for i in range(len(vptsx)):
-            cte = polynomial([vptsx[i]])[0]
-            if self.final_waypoints[i].twist.twist.linear.x < 0.:
-                self.final_waypoints[i].twist.twist.linear.x += 100.
-            self.final_waypoints[i].twist.twist.angular.z = cte
+        velocity = 0.
+
+
+        # test if we are stopping for a traffic light
+        braking_distance = 3*(self.restricted_speed+self.current_linear_velocity)
+        tl_dist = self.distanceToNextTrafficLight()
+        if (self.state == STOP or self.state == STOPPING) and tl_dist < braking_distance:
+            if len(self.lights) > 0 and self.lights[self.ctl].state != 0 and self.current_linear_velocity == 0.:
+                self.state = GOGO
+        if self.state != STOP and self.state != GOGO and tl_dist < braking_distance:
+            # red traffic light
+            if len(self.lights) > 0 and self.lights[self.ctl].state == 0 and self.current_linear_velocity > 0.01:
+                # stopping velocity
+                if self.state == STOPPING and tl_dist < 2.:
+                    if self.current_linear_velocity > 0.:
+                        velocity = -1000.
+                    else:
+                        velocity = 0.
+                        self.state = STOP
+                elif self.state == STOPPING and tl_dist < 5.:
+                    if self.current_linear_velocity > 0.:
+                        velocity = -2.*self.restricted_speed
+                    else:
+                        velocity = 0.
+                        self.state = STOP
+                elif self.state == STOPPING and tl_dist < 8.:
+                    if self.current_linear_velocity > 0.:
+                        velocity = -self.restricted_speed
+                    else:
+                        velocity = 0.
+                        self.state = STOP
+                else:
+                    # velocity = self.restricted_speed/(tl_dist-(braking_distance/3))
+                    velocity = self.restricted_speed/(tl_dist-(2*braking_distance/3))
+                    self.state = STOPPING
+            elif len(self.lights) > 0 and self.lights[self.ctl].state == 0 and self.current_linear_velocity < 0.01:
+                velocity = 0.
+                self.state = STOP
+            elif len(self.lights) > 0 and self.lights[self.ctl].state != 0 and self.current_linear_velocity < 0.01:
+                velocity = self.restricted_speed*mps
+                self.state = GO
+            else:
+                # slow down near traffic lights
+                velocity = self.restricted_speed*mps*.5
+                self.state = SLOWING
+            # calculate stopping trajectory
+            for i in range(len(vptsx)):
+                cte = polynomial([vptsx[i]])[0]
+
+                # need to create a new waypoint array so not to overwrite old one
+                p = Waypoint()
+                p.pose.pose.position.x = self.final_waypoints[i].pose.pose.position.x
+                p.pose.pose.position.y = self.final_waypoints[i].pose.pose.position.y
+                p.pose.pose.position.z = self.final_waypoints[i].pose.pose.position.z
+                p.pose.pose.orientation.x = self.final_waypoints[i].pose.pose.orientation.x
+                p.pose.pose.orientation.y = self.final_waypoints[i].pose.pose.orientation.y
+                p.pose.pose.orientation.z = self.final_waypoints[i].pose.pose.orientation.z
+                p.pose.pose.orientation.w = self.final_waypoints[i].pose.pose.orientation.w
+                p.twist.twist.linear.x = velocity
+                p.twist.twist.linear.y = 0.
+                p.twist.twist.linear.z = 0.
+                p.twist.twist.angular.x = 0.
+                p.twist.twist.angular.y = 0.
+                p.twist.twist.angular.z = cte
+                self.final_waypoints[i] = p
+        else:
+            self.state = GO
+            # calculate normal trajectory
+            for i in range(len(vptsx)):
+                cte = polynomial([vptsx[i]])[0]
+                if self.final_waypoints[i].twist.twist.linear.x < 0.:
+                    self.final_waypoints[i].twist.twist.linear.x += 100.
+                self.final_waypoints[i].twist.twist.angular.z = cte
+        print "state:", self.state, "current_linear_velocity:", self.current_linear_velocity, "velocity:", velocity
 
     def waypoints_cb(self, msg):
         # DONE: Implement
@@ -133,13 +249,14 @@ class WaypointUpdater(object):
                 waypoint.twist.twist.linear.x = mps*self.restricted_speed
                 self.waypoints.append(waypoint)
 
+            # calculate number of waypoints for stopping using current restricted speed limit.
+            wstop = int(4*self.restricted_speed)
             wlen = len(self.waypoints)
-            # gradually zero out the last 210 waypoints (negative flag)
-            for i in range(200):
-                self.waypoints[wlen-10-i].twist.twist.linear.x = -100. + mps*self.restricted_speed*(i/200)
-            # zero out the last 10 waypoints
-            for i in range(10):
-                self.waypoints[wlen-1-i].twist.twist.linear.x = -100.
+            # gradually zero out the last wstop waypoints (negative flag)
+            for i in range(wstop):
+                self.waypoints[wlen-1-i].twist.twist.linear.x = -100. + mps*self.restricted_speed*(i/wstop)
+            # zero out the last waypoint
+            self.waypoints[wlen-1].twist.twist.linear.x = -100.
 
             # NOTE: Per Yousuf Fauzan, we should STOP at last waypoint, so commenting out
             #       the following code to do the wrap around for a looped course.
@@ -159,8 +276,9 @@ class WaypointUpdater(object):
             # self.waypoints[len(self.waypoints)-1].twist.twist.angular.z = np.arctan2((y-lasty), (x-lastx))
 
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement
-        pass
+        # DONE: Callback for /traffic_waypoint message. Implement
+        self.lights = msg.lights
+        self.lights[1].state = 0
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
