@@ -8,3 +8,4 @@ scipy
 keras>=2.0.0
 tensorflow-gpu>=1.0.0
 h5py
+pygame

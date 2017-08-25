@@ -75,6 +75,16 @@ cd SDC-System-Integration
         git push -u origin <your branch>
         ```
 3. Install python dependencies
+* With Pygame for Diagnostics
+    * For non-GPU Linux systems
+        ```bash
+        sudo -H pip install -r requirements-pygame.txt
+        ```
+    * For GPU Linux systems
+        ```bash
+        sudo -H pip install -r requirements-gpu-pygame.txt
+        ```
+* Without Pygame
     * For non-GPU Linux systems
         ```bash
         sudo -H pip install -r requirements.txt
