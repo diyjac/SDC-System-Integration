@@ -5,6 +5,7 @@ This is Team Vulture project repo for the final project of the Udacity Self-Driv
 ### The Team
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
+
 The following are the member of Team Vulture.
 
 * __Team Lead__: John Chen, diyjac@gmail.com
