@@ -143,6 +143,6 @@ python rosbag_video_2_gif.py --dataset <rosbags> <gif file>
 
 Full length MP4 videos of the Udacity provided sample rosbags are available:
 
-![just_traffic_light.mp4](./imgs/just_traffic_light.mp4)
-![loop_with_traffic_light.mp4](./imgs/loop_with_traffic_light.mp4)
+![./imgs/just_traffic_light.mp4](./imgs/just_traffic_light.mp4)
+![./imgs/loop_with_traffic_light.mp4](./imgs/loop_with_traffic_light.mp4)
 
