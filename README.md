@@ -87,11 +87,11 @@ cd SDC-System-Integration
 * Without Pygame
     * For non-GPU Linux systems
         ```bash
-        sudo -H pip install -r requirements.txt
+        pip install -r requirements.txt
         ```
     * For GPU Linux systems
         ```bash
-        sudo -H pip install -r requirements-gpu.txt
+        pip install -r requirements-gpu.txt
         ```
 4. Make and run styx
 ```bash
