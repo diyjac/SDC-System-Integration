@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import Int32
-from geometry_msgs.msg import PoseStamped, Pose
+from geometry_msgs.msg import PoseStamped, Pose, TwistStamped
 from styx_msgs.msg import TrafficLightArray, TrafficLight, Lane, Waypoint
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from sensor_msgs.msg import Image
@@ -15,11 +15,14 @@ import numpy as np
 import math
 from traffic_light_config import config
 
+MPS = 0.44704
+
 class GenerateDiagnostics():
     def __init__(self):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('diag_gps')
 
+        self.restricted_speed = 10.
         self.cv_image = None
         self.camera_image = None
         self.lights = []
@@ -28,7 +31,10 @@ class GenerateDiagnostics():
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         self.sub_fwaypoints = rospy.Subscriber('/final_waypoints', Lane, self.fwaypoints_cb)
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        self.sub_current_velocity = rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
         self.sub_current_pose = rospy.Subscriber('/vehicle/steering_cmd', SteeringCmd, self.steering_cb)
+        self.throttle_pub = rospy.Subscriber('/vehicle/throttle_cmd', ThrottleCmd, self.throttle_cb)
+        self.brake_pub = rospy.Subscriber('/vehicle/brake_cmd', BrakeCmd, self.brake_cb)
         self.sub_traffic_lights = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
         self.sub_raw_camera = None
         self.bridge = CvBridge()
@@ -41,6 +47,8 @@ class GenerateDiagnostics():
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
+        self.current_linear_velocity = 0.
+        self.current_angular_velocity = 0.
 
         self.img_rows = 2500
         self.img_cols = 2500
@@ -49,6 +57,7 @@ class GenerateDiagnostics():
         self.waypoints = None
         self.fwaypointsx = []
         self.fwaypointsy = []
+        self.fwaypointss = []
         self.fwaypointx = 0.
         self.fwaypointy = 0.
         self.screen = None
@@ -137,6 +146,12 @@ class GenerateDiagnostics():
     def steering_cb(self, msg):
         self.steering_cmd = msg.steering_wheel_angle_cmd
 
+    def throttle_cb(self, msg):
+        self.throttle_cmd = msg.pedal_cmd
+
+    def brake_cb(self, msg):
+        self.brake_cmd = msg.pedal_cmd
+
     def pose_cb(self, msg):
         self.i += 1
         self.pose = msg
@@ -148,6 +163,10 @@ class GenerateDiagnostics():
             self.pose.pose.orientation.w])
         self.theta = euler[2]
 
+    def velocity_cb(self, msg):
+        self.current_linear_velocity = msg.twist.linear.x
+        self.current_angular_velocity = msg.twist.angular.z
+
     def waypoints_cb(self, msg):
         # DONE: Implement
         if self.waypoints is None:
@@ -155,9 +174,10 @@ class GenerateDiagnostics():
             for waypoint in msg.waypoints:
                 self.waypoints.append(waypoint)
 
-            # make sure we wrap!
-            self.waypoints.append(msg.waypoints[0])
-            self.waypoints.append(msg.waypoints[1])
+            # No wrapping for this project!
+            # # make sure we wrap!
+            # self.waypoints.append(msg.waypoints[0])
+            # self.waypoints.append(msg.waypoints[1])
 
             # create the polyline that defines the track
             x = []
@@ -176,11 +196,14 @@ class GenerateDiagnostics():
         waypoints = []
         fx = []
         fy = []
+        fs = []
         for i in range(len(msg.waypoints)):
             fx.append(float(msg.waypoints[i].pose.pose.position.x))
             fy.append(self.img_rows-(float(msg.waypoints[i].pose.pose.position.y)-1000.))
+            fs.append(int(msg.waypoints[i].twist.twist.linear.x/(self.restricted_speed*MPS)*255))
         self.fwaypointsx = fx
         self.fwaypointsy = fy
+        self.fwaypointss = fs
         self.fwaypointx = fx[0]
         self.fwaypointy = fy[0]
 
@@ -205,15 +228,27 @@ class GenerateDiagnostics():
         self.ctl = ctl
         return dist
 
-    def drawWaypoints(self, img, size=5):
+    def drawWaypoints(self, img, size=5, size2=10):
         color = (128, 128, 128)
+        color2 = (128, 0, 0)
         cv2.polylines(img, [self.XYPolyline], 0, color, size)
+        lastwp = len(self.waypoints)-1
+        x = int(self.waypoints[lastwp].pose.pose.position.x)
+        y = int(self.img_rows-(self.waypoints[lastwp].pose.pose.position.y-1000.))
+        cv2.circle(img, (x, y), size2,  color2, -1)
 
-    def drawFinalWaypoints(self, img, size=1, size2=10):
-        color = (0, 0, 255)
+    def drawFinalWaypoints(self, img, size=1, size2=15):
         for i in range(len(self.fwaypointsx)):
+            if self.fwaypointss[i] > 0:
+                color = (0, 192, 0)
+            else:
+                color = (192, 0, 0)
             cv2.circle(img, (int(self.fwaypointsx[i]), int(self.fwaypointsy[i])), size, color, -1)
         if len(self.fwaypointsx) > 0:
+            if self.fwaypointss[i] > 0:
+                color = (0, 192, 0)
+            else:
+                color = (192, 0, 0)
             cv2.circle(img, (int(self.fwaypointsx[0]), int(self.fwaypointsy[0])), size2, color, -1)
 
     def drawTrafficLights(self, img, size=10):
@@ -256,14 +291,14 @@ class GenerateDiagnostics():
                     text0 = "Frame: %d"
                     text1 = "Nearest Traffic Light (%d) is %fm ahead."
                     text2 = "Current position is (%f, %f, %f)."
-                    text3 = "Current Vehicle Yaw is %f."
-                    text4 = "Current Steering angle is %f."
+                    text3 = "Current Vehicle Yaw: %f     Linear Velocity: %f    Angular Velocity: %f"
+                    text4 = "Current Steering Angle: %f      Throttle: %f       Brake: %f"
                     text5 = "Next Waypoint position is (%f, %f) with %d array len."
                     cv2.putText(self.cv_image, text0%(self.i), (100,  30), font, 1, color, 2)
                     cv2.putText(self.cv_image, text1%(self.ctl, tl_dist), (100,  60), font, 1, color, 2)
                     cv2.putText(self.cv_image, text2%(self.position.x, self.position.y, self.position.z),  (100,  90), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text3%(self.theta),  (100, 120), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text4%(self.steering_cmd),  (100, 150), font, 1, color, 2)
+                    cv2.putText(self.cv_image, text3%(self.theta, self.current_linear_velocity, self.current_angular_velocity),  (100, 120), font, 1, color, 2)
+                    cv2.putText(self.cv_image, text4%(self.steering_cmd, self.throttle_cmd, self.brake_cmd),  (100, 150), font, 1, color, 2)
                     cv2.putText(self.cv_image, text5%(self.fwaypointx, self.fwaypointy, len(self.fwaypointsx)),  (100, 180), font, 1, color, 2)
 
                     if self.camera_image is not None:

@@ -69,7 +69,8 @@ class DBWNode(object):
         # TODO: Create `TwistController` object
         self.controller = Controller(
             self.wheel_base, self.steer_ratio, self.min_speed,
-            self.max_lat_accel, self.max_steer_angle)
+            self.accel_limit, self.max_steer_angle,
+            self.vehicle_mass, self.wheel_radius, self.brake_deadband)
 
         # TODO: Subscribe to all the topics you need to
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)

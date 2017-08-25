@@ -3,6 +3,9 @@
 This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
 
 ### The Team
+
+![Team Vulture Mascot](./imgs/vulture.JPG)
+
 The following are the member of Team Vulture.
 
 * __Team Lead__: John Chen, diyjac@gmail.com
@@ -72,9 +75,24 @@ cd SDC-System-Integration
         git push -u origin <your branch>
         ```
 3. Install python dependencies
-```bash
-pip install -r requirements.txt
-```
+* With Pygame and MoviePy for Diagnostics and converting rosbags
+    * For non-GPU Linux systems
+        ```bash
+        sudo -H pip install -r requirements-pygame.txt
+        ```
+    * For GPU Linux systems
+        ```bash
+        sudo -H pip install -r requirements-gpu-pygame.txt
+        ```
+* Without Pygame nor MoviePy
+    * For non-GPU Linux systems
+        ```bash
+        pip install -r requirements.txt
+        ```
+    * For GPU Linux systems
+        ```bash
+        pip install -r requirements-gpu.txt
+        ```
 4. Make and run styx
 ```bash
 cd ros
@@ -112,3 +130,13 @@ rosrun tools diagScreen.py
 ```
 ![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-sysint-diagnostics.gif)
 
+10. To view sample Udacity provided rosbags, convert them to MP4 or GIFS use the following:
+* __NOTE__: Requires pygame and moviepy!
+```
+cd ../tools
+python view_rosbag_video.py --dataset <rosbags>
+python rosbag_video_2_mp4.py --dataset <rosbags> <mp4 file>
+python rosbag_video_2_gif.py --dataset <rosbags> <gif file>
+```
+![./imgs/just_traffic_light.gif](./imgs/just_traffic_light.gif)
+![./imgs/loop_with_traffic_light.gif](./imgs/loop_with_traffic_light.gif)
