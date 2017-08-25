@@ -75,7 +75,7 @@ cd SDC-System-Integration
         git push -u origin <your branch>
         ```
 3. Install python dependencies
-* With Pygame for Diagnostics
+* With Pygame and MoviePy for Diagnostics and converting rosbags
     * For non-GPU Linux systems
         ```bash
         sudo -H pip install -r requirements-pygame.txt
@@ -84,7 +84,7 @@ cd SDC-System-Integration
         ```bash
         sudo -H pip install -r requirements-gpu-pygame.txt
         ```
-* Without Pygame
+* Without Pygame nor MoviePy
     * For non-GPU Linux systems
         ```bash
         pip install -r requirements.txt
@@ -130,3 +130,13 @@ rosrun tools diagScreen.py
 ```
 ![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-sysint-diagnostics.gif)
 
+10. To view sample Udacity provided rosbags, convert them to MP4 or GIFS use the following:
+* __NOTE__: Requires pygame and moviepy!
+```
+cd ../tools
+python view_rosbag_video.py --dataset <rosbags>
+python rosbag_video_2_mp4.py --dataset <rosbags> <mp4 file>
+python rosbag_video_2_gif.py --dataset <rosbags> <gif file>
+```
+![./imgs/just_traffic_light.gif](./imgs/just_traffic_light.gif)
+![./imgs/loop_with_traffic_light.gif](./imgs/loop_with_traffic_light.gif)
