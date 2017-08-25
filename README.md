@@ -130,13 +130,14 @@ rosrun tools diagScreen.py
 ```
 ![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-sysint-diagnostics.gif)
 
-10. To view sample Udacity provided rosbags, convert them to MP4 or GIFS use the following:
+10. To view sample Udacity provided rosbags, convert them to MP4, GIFS or JPG use the following:
 * __NOTE__: Requires pygame and moviepy!
 ```
 cd ../tools
 python view_rosbag_video.py --dataset <rosbags>
-python rosbag_video_2_mp4.py --dataset <rosbags> <mp4 file>
-python rosbag_video_2_gif.py --dataset <rosbags> <gif file>
+python rosbag_video_2_mp4.py --dataset <rosbags> <path to mp4 file>
+python rosbag_video_2_gif.py --dataset <rosbags> <path to gif file>
+python rosbag_video_2_jpg.py --dataset <rosbags> '<path to rosbag_%04d.jpg>'
 ```
 ![./imgs/just_traffic_light.gif](./imgs/just_traffic_light.gif)
 ![./imgs/loop_with_traffic_light.gif](./imgs/loop_with_traffic_light.gif)
@@ -146,3 +147,12 @@ Full length MP4 videos of the Udacity provided sample rosbags are available for 
 * [./imgs/just_traffic_light.mp4](./imgs/just_traffic_light.mp4)
 * [./imgs/loop_with_traffic_light.mp4](./imgs/loop_with_traffic_light.mp4)
 
+Samples of jpeg images extracted:
+
+![./test_images/loop_with_traffic_light_0283.jpg](./test_images/loop_with_traffic_light_0283.jpg)
+![./test_images/just_traffic_light_0461.jpg](./test_images/just_traffic_light_0461.jpg)
+
+CSV files with pose and manually updated labels:
+
+* [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
+* [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
