@@ -1,13 +1,16 @@
 ## Udacity Self Driving Car Nanodegree Final Project: System Integration
 
-This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.
+This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
 
 ### The Team
+
+![Team Vulture Mascot](./imgs/vulture.JPG)
+
 The following are the member of Team Vulture.
 
 * __Team Lead__: John Chen, diyjac@gmail.com
 * Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, __Needs attention__
+* Sebastian Trick, sebastian.trick@gmail.com
 * Yuesong Xie, cedric_xie@hotmail.com
 * Kungfeng Chen, kunfengchen@live.com
 
@@ -30,6 +33,9 @@ __GO VULTURE!__
   * [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu) if you have Ubuntu 14.04.
   * [Dataspeed DBW](https://bitbucket.org/DataspeedInc/dbw_mkz_ros)
   * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
+
+* Download the [Udacity Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/v0.1).
+
     __NOTE__: *If you are installing in native Ubuntu 16.04, the Dataspeed DBW One Line SDK binary install will auto install 4.4.0-92-generic Linux kernel, which will break CUDA and the NVIDIA 375 drivers if you have NVIDIA GPU in your native Ubuntu 16.04 build.  This will cause starting the simulator to fail because it can no longer open the OpenGL drivers provided by NVIDIA:*
 
     ![starting simulator failure image](./imgs/sim_startup_failure_caused_by_4.4.0-92-generic_kernel.png)
@@ -43,8 +49,6 @@ __GO VULTURE!__
 
         [https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics](https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics)
     
-* Download the [Udacity Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/v0.1).
-
 ### Usage
 
 1. Clone the project repository
@@ -71,9 +75,24 @@ cd SDC-System-Integration
         git push -u origin <your branch>
         ```
 3. Install python dependencies
-```bash
-pip install -r requirements.txt
-```
+* With Pygame and MoviePy for Diagnostics and converting rosbags
+    * For non-GPU Linux systems
+        ```bash
+        sudo -H pip install -r requirements-pygame.txt
+        ```
+    * For GPU Linux systems
+        ```bash
+        sudo -H pip install -r requirements-gpu-pygame.txt
+        ```
+* Without Pygame nor MoviePy
+    * For non-GPU Linux systems
+        ```bash
+        pip install -r requirements.txt
+        ```
+    * For GPU Linux systems
+        ```bash
+        pip install -r requirements-gpu.txt
+        ```
 4. Make and run styx
 ```bash
 cd ros
@@ -104,10 +123,41 @@ rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 ```
 ![./imgs/sim_waypoint_map.png](./imgs/sim_waypoint_map.png)
 
-9. To view the front camera in real-time from the simulator
+9. To view the diagnostics screen in real-time when the integrated system is running
 * __NOTE__: Requires pygame!
 ```bash
-rosrun tools viewFrontCamera.py
+rosrun tools diagScreen.py
 ```
-![./imgs/front-camera-viewer.png](./imgs/sdc-t3-sysint-front-camera-viewer.gif)
+![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-sysint-diagnostics.gif)
+
+10. To view sample Udacity provided rosbags, convert them to MP4, GIFS or JPG use the following:
+* __NOTE__: Requires pygame and moviepy!
+```
+cd ../tools
+python view_rosbag_video.py --dataset <rosbags>
+python rosbag_video_2_mp4.py --dataset <rosbags> <path to mp4 file>
+python rosbag_video_2_gif.py --dataset <rosbags> <path to gif file>
+python rosbag_video_2_jpg.py --dataset <rosbags> '<path to rosbag_%04d.jpg>'
+```
+![./imgs/just_traffic_light.gif](./imgs/just_traffic_light.gif)
+![./imgs/loop_with_traffic_light.gif](./imgs/loop_with_traffic_light.gif)
+
+Full length MP4 videos of the Udacity provided sample rosbags are available for download:
+
+* [./imgs/just_traffic_light.mp4](./imgs/just_traffic_light.mp4)
+* [./imgs/loop_with_traffic_light.mp4](./imgs/loop_with_traffic_light.mp4)
+
+Samples of jpeg images extracted:
+
+![./test_images/loop_with_traffic_light_0283.jpg](./test_images/loop_with_traffic_light_0283.jpg)
+![./test_images/just_traffic_light_0461.jpg](./test_images/just_traffic_light_0461.jpg)
+
+CSV files with pose and manually updated labels:
+
+* [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
+* [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
+
+SDC System Integration Carla Test Course Map from rosbag sample:
+
+![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
