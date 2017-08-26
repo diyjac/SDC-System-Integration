@@ -156,3 +156,8 @@ CSV files with pose and manually updated labels:
 
 * [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
 * [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
+
+SDC System Integration Carla Test Course Map from rosbag sample:
+
+![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
+
