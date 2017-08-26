@@ -1,0 +1,15 @@
+fname;class;p0 (no);p1 (red);p2 (green);;true;false
+01_green_SantaClara-640480.jpg;2;0,000;0,000;0,999;;x;
+02_red_Intra.jpg;1;0,000;1,000;0,000;;x;
+03_off_Intra.jpg;0;0,971;0,014;0,016;;x;
+04_green_Intra.jpg;2;0,000;0,001;0,999;;x;
+05_green_Intra.JPG;2;0,000;0,001;0,999;;x;
+06_off_MountainView.jpg;0;0,766;0,226;0,008;;x;
+07_green_SantaClara.jpg;2;0,000;0,000;1,000;;x;
+08_green_SantaClara.jpg;2;0,000;0,000;1,000;;x;
+09_no_SanFrancisco.jpg;0;0,996;0,002;0,002;;x;
+11_off_SanFrancisco.jpg;0;0,990;0,004;0,006;;x;
+12_off_MountainView.jpg;2;0,123;0,029;0,848;;;x
+13_off_MountainView.jpg;0;0,909;0,063;0,028;;x;
+;;;;;12;11;1
+;;;;;;91,7%;
