@@ -317,8 +317,7 @@ class GenerateDiagnostics():
                         self.sub_raw_camera = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
 
                 if (self.sub_waypoints is None and self.steering_cmd is not None and
-                        self.throttle_cmd is not None and self.brake_cmd is not None and
-                        len(self.frame_history) == len(self.steering_history)):
+                        self.throttle_cmd is not None and self.brake_cmd is not None):
                     self.cv_image = np.zeros((self.img_rows, self.img_cols, self.img_ch), dtype=np.uint8)
                     self.drawWaypoints(self.cv_image)
                     self.drawFinalWaypoints(self.cv_image)
@@ -338,29 +337,30 @@ class GenerateDiagnostics():
                     cv2.putText(self.cv_image, text4%(self.steering_cmd, self.throttle_cmd, self.brake_cmd),  (self.img_vis_txt_x, self.img_vis_txt_y*5), font, self.img_vis_font_size, color, 2)
                     cv2.putText(self.cv_image, text5%(self.fwaypointx, self.fwaypointy, len(self.fwaypointsx)),  (self.img_vis_txt_x, self.img_vis_txt_y*6), font, self.img_vis_font_size, color, 2)
 
-                    # Output plots for velocity/steering/throttle/brake
+                    # Output plots for velocity/steering/throttle/brake but only if we have enough data points...
                     mindata = min([len(self.frame_history), len(self.vel_history), len(self.steering_history), len(self.throttle_history), len(self.brake_history)])
-                    fig = plt.figure(figsize=(16, 6), dpi=100)
-                    ax1 = fig.add_subplot(111)
-                    p1 = ax1.plot(self.frame_history[:mindata],self.vel_history[:mindata], color='c', label='Velocity')
-                    p2 = ax1.plot(self.frame_history[:mindata],self.steering_history[:mindata], color='b', label='Steering')
-                    ax1.set_ylabel('Velocity and Steering')
-                    ax2 = ax1.twinx()
-                    p3 = ax2.plot(self.frame_history[:mindata],self.brake_history[:mindata], 'r', label='Brake')
-                    p4 = ax2.plot(self.frame_history[:mindata],self.throttle_history[:mindata], color='g', label='Throttle')
-                    ax2.set_ylabel('Throttle and Brake', color='r')
-                    ps = p1 + p2 + p3 + p4
-                    lps = [l.get_label() for l in ps]
-                    plt.legend(ps, lps, loc=2)
-                    for tl in ax2.get_yticklabels():
-                        tl.set_color('r')
+                    if mindata > self.max_history_size//2:
+                        fig = plt.figure(figsize=(16, 6), dpi=100)
+                        ax1 = fig.add_subplot(111)
+                        p1 = ax1.plot(self.frame_history[:mindata],self.vel_history[:mindata], color='c', label='Velocity')
+                        p2 = ax1.plot(self.frame_history[:mindata],self.steering_history[:mindata], color='b', label='Steering')
+                        ax1.set_ylabel('Velocity and Steering')
+                        ax2 = ax1.twinx()
+                        p3 = ax2.plot(self.frame_history[:mindata],self.brake_history[:mindata], 'r', label='Brake')
+                        p4 = ax2.plot(self.frame_history[:mindata],self.throttle_history[:mindata], color='g', label='Throttle')
+                        ax2.set_ylabel('Throttle and Brake', color='r')
+                        ps = p1 + p2 + p3 + p4
+                        lps = [l.get_label() for l in ps]
+                        plt.legend(ps, lps, loc=2)
+                        for tl in ax2.get_yticklabels():
+                            tl.set_color('r')
 
-                    fig.canvas.draw()
-                    # Now we can save it to a numpy array.
-                    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-                    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-                    self.cv_image[self.img_rows//3*2-200:self.img_rows//3*2+400, self.img_cols//2-800:self.img_cols//2+800] = data
-                    plt.cla()
+                        fig.canvas.draw()
+                        # Now we can save it to a numpy array.
+                        data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                        data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+                        self.cv_image[self.img_rows//3*2-200:self.img_rows//3*2+400, self.img_cols//2-800:self.img_cols//2+800] = data
+                        plt.cla()
 
                     if self.camera_image is not None:
                         self.cv_image[self.img_rows//3:self.img_rows//3+600, self.img_cols//2-400:self.img_cols//2+400] = cv2.resize(self.camera_image, (800,600), interpolation=cv2.INTER_AREA)
