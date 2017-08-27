@@ -33,6 +33,8 @@ class TLClassifier(object):
         preds = model.predict(image)[0]
         predclass = str(np.argmax(preds))
         print(predclass)
+        ##predclass = 2
+        print("hello tl_classifier")
         # 
         # predclass
         # 0: no traffic light
@@ -42,7 +44,7 @@ class TLClassifier(object):
           return TrafficLight.RED
         elif (predclass == 2):
           return TrafficLight.GREEN
-        elif (predclass == 3)
+        elif (predclass == 3):
           return TrafficLight.YELLOW
         else:    
           return TrafficLight.UNKNOWN
