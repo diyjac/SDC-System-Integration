@@ -179,27 +179,43 @@ class WaypointUpdater(object):
             if len(self.lights) > 0 and self.lights[self.ctl].state == 0 and self.current_linear_velocity > 0.01:
                 # stopping velocity
                 if self.state == STOPPING and tl_dist < 2.:
-                    if self.current_linear_velocity > 0.:
-                        velocity = -1000.
+                    if self.current_linear_velocity > mps:
+                        velocity = -self.restricted_speed*mps*4
+                    elif self.current_linear_velocity > mps/4:
+                        velocity = -self.restricted_speed*mps
                     else:
                         velocity = 0.
                         self.state = STOP
                 elif self.state == STOPPING and tl_dist < 5.:
-                    if self.current_linear_velocity > 0.:
-                        velocity = -2.*self.restricted_speed
+                    if self.current_linear_velocity > 5*mps:
+                        velocity = -self.restricted_speed*mps*4
+                    elif self.current_linear_velocity > 3*mps:
+                        velocity = -self.restricted_speed*mps*3
+                    elif self.current_linear_velocity > 2*mps:
+                        velocity = -self.restricted_speed*mps*2
+                    elif self.current_linear_velocity > mps:
+                        velocity = -self.restricted_speed*mps
                     else:
-                        velocity = 0.
-                        self.state = STOP
-                elif self.state == STOPPING and tl_dist < 8.:
-                    if self.current_linear_velocity > 0.:
-                        velocity = -self.restricted_speed
-                    else:
-                        velocity = 0.
-                        self.state = STOP
+                        velocity = 1.*mps/5
+                #elif self.state == STOPPING and tl_dist < 10. and self.current_linear_velocity > 3.:
+                #    velocity = -self.restricted_speed
+                #elif self.state == STOPPING and tl_dist < 10. and self.current_linear_velocity > 2.:
+                #    velocity = -self.restricted_speed*.75
+                elif self.state == STOPPING and tl_dist < 10. and self.current_linear_velocity > 1*mps:
+                    velocity = 1.*mps/5
+                #elif self.state == STOPPING and tl_dist < braking_distance*.25:
+                #    if self.current_linear_velocity > 0.75:
+                #        velocity = -self.restricted_speed*.1
+                #    else:
+                #        velocity = 0.
+                #        self.state = STOP
                 else:
-                    # velocity = self.restricted_speed/(tl_dist-(braking_distance/3))
-                    velocity = self.restricted_speed/(tl_dist-(2*braking_distance/3))
-                    self.state = STOPPING
+                    if self.current_linear_velocity > 5*mps:
+                        velocity = (self.restricted_speed*mps)/(tl_dist-(2*braking_distance/3))
+                        self.state = STOPPING
+                    else:
+                        velocity = self.restricted_speed*mps/2.
+                        self.state = STOPPING
             elif len(self.lights) > 0 and self.lights[self.ctl].state == 0 and self.current_linear_velocity < 0.01:
                 velocity = 0.
                 self.state = STOP
