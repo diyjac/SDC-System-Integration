@@ -12,6 +12,7 @@ import cv2
 import pygame
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 import math
 from traffic_light_config import config
 
@@ -28,11 +29,18 @@ class GenerateDiagnostics():
         self.lights = []
         self.i = 0
 
+        self.frame_history = []
+        self.vel_history = []
+        self.steering_history = []
+        self.throttle_history = []
+        self.brake_history = []
+        self.max_history_size = 10
+
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         self.sub_fwaypoints = rospy.Subscriber('/final_waypoints', Lane, self.fwaypoints_cb)
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_current_velocity = rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
-        self.sub_current_pose = rospy.Subscriber('/vehicle/steering_cmd', SteeringCmd, self.steering_cb)
+        self.steering_pub = rospy.Subscriber('/vehicle/steering_cmd', SteeringCmd, self.steering_cb)
         self.throttle_pub = rospy.Subscriber('/vehicle/throttle_cmd', ThrottleCmd, self.throttle_cb)
         self.brake_pub = rospy.Subscriber('/vehicle/brake_cmd', BrakeCmd, self.brake_cb)
         self.sub_traffic_lights = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
@@ -41,7 +49,7 @@ class GenerateDiagnostics():
 
         # test different raw image update rates:
         # - 2 - 2 frames a second
-        self.updateRate = 2
+        self.updateRate = 1000
 
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
@@ -64,6 +72,11 @@ class GenerateDiagnostics():
         self.position = None
         self.theta = None
         self.lights = []
+
+        self.img_vis_ratio = 4
+        self.img_vis_font_size = 2
+        self.img_vis_txt_x = 100
+        self.img_vis_txt_y = 100
 
         self.loop()
 
@@ -145,12 +158,21 @@ class GenerateDiagnostics():
 
     def steering_cb(self, msg):
         self.steering_cmd = msg.steering_wheel_angle_cmd
+        if len(self.steering_history)>self.max_history_size:
+            self.steering_history.pop(0)
+        self.steering_history.append(self.steering_cmd)
 
     def throttle_cb(self, msg):
         self.throttle_cmd = msg.pedal_cmd
+        if len(self.throttle_history)>self.max_history_size:
+            self.throttle_history.pop(0)
+        self.throttle_history.append(self.throttle_cmd)
 
     def brake_cb(self, msg):
         self.brake_cmd = msg.pedal_cmd
+        if len(self.brake_history)>self.max_history_size:
+            self.brake_history.pop(0)
+        self.brake_history.append(self.brake_cmd)
 
     def pose_cb(self, msg):
         self.i += 1
@@ -166,6 +188,11 @@ class GenerateDiagnostics():
     def velocity_cb(self, msg):
         self.current_linear_velocity = msg.twist.linear.x
         self.current_angular_velocity = msg.twist.angular.z
+        if len(self.vel_history)>self.max_history_size:
+            self.vel_history.pop(0)
+            self.frame_history.pop(0)
+        self.vel_history.append(self.current_linear_velocity)
+        self.frame_history.append(self.i)
 
     def waypoints_cb(self, msg):
         # DONE: Implement
@@ -290,16 +317,38 @@ class GenerateDiagnostics():
                     color = (192, 192, 0)
                     text0 = "Frame: %d"
                     text1 = "Nearest Traffic Light (%d) is %fm ahead."
-                    text2 = "Current position is (%f, %f, %f)."
-                    text3 = "Current Vehicle Yaw: %f     Linear Velocity: %f    Angular Velocity: %f"
-                    text4 = "Current Steering Angle: %f      Throttle: %f       Brake: %f"
+                    text2 = "Curr. position is (%f, %f, %f)."
+                    text3 = "Curr. Vehicle Yaw: %f    Linear Vel.: %f  Angular Vel.: %f"
+                    text4 = "Curr. Steering Ang.: %f  Throttle: %f     Brake: %f"
                     text5 = "Next Waypoint position is (%f, %f) with %d array len."
-                    cv2.putText(self.cv_image, text0%(self.i), (100,  30), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text1%(self.ctl, tl_dist), (100,  60), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text2%(self.position.x, self.position.y, self.position.z),  (100,  90), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text3%(self.theta, self.current_linear_velocity, self.current_angular_velocity),  (100, 120), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text4%(self.steering_cmd, self.throttle_cmd, self.brake_cmd),  (100, 150), font, 1, color, 2)
-                    cv2.putText(self.cv_image, text5%(self.fwaypointx, self.fwaypointy, len(self.fwaypointsx)),  (100, 180), font, 1, color, 2)
+                    cv2.putText(self.cv_image, text0%(self.i), (self.img_vis_txt_x,  self.img_vis_txt_y), font, self.img_vis_font_size, color, 2)
+                    cv2.putText(self.cv_image, text1%(self.ctl, tl_dist), (self.img_vis_txt_x,  self.img_vis_txt_y*2), font, self.img_vis_font_size, color, 2)
+                    cv2.putText(self.cv_image, text2%(self.position.x, self.position.y, self.position.z),  (self.img_vis_txt_x,  self.img_vis_txt_y*3), font, self.img_vis_font_size, color, 2)
+                    cv2.putText(self.cv_image, text3%(self.theta, self.current_linear_velocity, self.current_angular_velocity),  (self.img_vis_txt_x, self.img_vis_txt_y*4), font, self.img_vis_font_size, color, 2)
+                    cv2.putText(self.cv_image, text4%(self.steering_cmd, self.throttle_cmd, self.brake_cmd),  (self.img_vis_txt_x, self.img_vis_txt_y*5), font, self.img_vis_font_size, color, 2)
+                    cv2.putText(self.cv_image, text5%(self.fwaypointx, self.fwaypointy, len(self.fwaypointsx)),  (self.img_vis_txt_x, self.img_vis_txt_y*6), font, self.img_vis_font_size, color, 2)
+
+                    fig, axes = plt.subplots(nrows = 1, ncols = 4, figsize=(16, 6), dpi=100)
+                    axes[0].plot(self.frame_history,self.vel_history)
+                    #axes.set_ylabel('Velocity')
+                    #axes.set_ylim((0, self.restricted_speed))
+                    axes[1].plot(self.frame_history,self.steering_history)
+                    axes[2].plot(self.frame_history,self.throttle_history)
+                    axes[3].plot(self.frame_history,self.brake_history)
+                    axes[0].set_title('Velocity')
+                    axes[1].set_title('Steering')
+                    axes[2].set_title('Throttle')
+                    axes[3].set_title('Brake')
+                    axes[0].set_xlabel('Frame')
+                    axes[1].set_xlabel('Frame')
+                    axes[2].set_xlabel('Frame')
+                    axes[3].set_xlabel('Frame')
+                    #fig.show()
+                    fig.canvas.draw()
+                    # Now we can save it to a numpy array.
+                    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+                    self.cv_image[self.img_rows//3*2-200:self.img_rows//3*2+400, self.img_cols//2-800:self.img_cols//2+800] = data
 
                     if self.camera_image is not None:
                         self.cv_image[self.img_rows//3:self.img_rows//3+600, self.img_cols//2-400:self.img_cols//2+400] = cv2.resize(self.camera_image, (800,600), interpolation=cv2.INTER_AREA)
@@ -313,10 +362,10 @@ class GenerateDiagnostics():
         if self.screen is None:
             pygame.init()
             pygame.display.set_caption("Udacity SDC System Integration Project: Vehicle Diagnostics")
-            self.screen = pygame.display.set_mode((self.img_cols//2,self.img_rows//2), pygame.DOUBLEBUF)
+            self.screen = pygame.display.set_mode((self.img_cols//self.img_vis_ratio,self.img_rows//self.img_vis_ratio), pygame.DOUBLEBUF)
         ## give us a machine view of the world
-        self.sim_img = pygame.image.fromstring(cv2.resize(self.cv_image,(self.img_cols//2, self.img_rows//2),
-            interpolation=cv2.INTER_AREA).tobytes(), (self.img_cols//2, self.img_rows//2), 'RGB')
+        self.sim_img = pygame.image.fromstring(cv2.resize(self.cv_image,(self.img_cols//self.img_vis_ratio, self.img_rows//self.img_vis_ratio),
+            interpolation=cv2.INTER_AREA).tobytes(), (self.img_cols//self.img_vis_ratio, self.img_rows//self.img_vis_ratio), 'RGB')
         self.screen.blit(self.sim_img, (0,0))
         pygame.display.flip()
 
@@ -326,5 +375,3 @@ if __name__ == "__main__":
         GenerateDiagnostics()
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')
-
-
