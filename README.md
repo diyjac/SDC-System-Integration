@@ -126,7 +126,7 @@ rosrun tools dumpFinalWaypoints.py ../data/final_waypoints.csv
 9. To view the diagnostics screen in real-time when the integrated system is running
 * __NOTE__: Requires pygame!
 ```bash
-rosrun tools diagScreen.py
+rosrun tools diagScreen.py --screensize 2 --maxhistory 800 --textspacing 75 --fontsize 1.5
 ```
 ![./imgs/sdc-t3-sysint-diag-screen.png](./imgs/sdc-sysint-diagnostics.gif)
 
