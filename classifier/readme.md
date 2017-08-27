@@ -81,6 +81,16 @@ Caleb Kirksey provided us with two bag files with an image feed from the Udacity
 
 Caleb Kirksey: "The video has some shots of the traffic light that we'll be using in testing. I'll follow up with the relative location of the traffic light as well as more images of the light for training a neural net."
 
+
+#### Data Overview after splitting into train and test data folders
+
+|                                    | 0-red | 1-yellow | 2-green | 4-unknown | Sum  |
+|:-----------------------------------|:-----:|:--------:|:-------:|:---------:|:----:|
+| test_images                        |       |          |         |           | 1861 |
+| 06-test_images__udacity              | 332   | 133      | 467     | 929       | 1861 |
+| traffic_light__images_udacity/train | 269   | 108      | 371     | 740       | 1488 |
+| traffic_light_images_udacity/test  | 63    | 25       | 96      | 189       | 373  |
+
 ## 2. Neural Net Candidates
 
 ## 2.1 Traffic Light Color Classifier (Rainer)
