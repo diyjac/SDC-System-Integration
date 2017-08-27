@@ -29,6 +29,7 @@ class GenerateDiagnostics():
         self.lights = []
         self.i = 0
 
+        # lists for storing history values
         self.frame_history = []
         self.vel_history = []
         self.steering_history = []
@@ -73,6 +74,7 @@ class GenerateDiagnostics():
         self.theta = None
         self.lights = []
 
+        # parameters for adjusting the output window size and text output
         self.img_vis_ratio = 4
         self.img_vis_font_size = 2
         self.img_vis_txt_x = 100
@@ -328,6 +330,7 @@ class GenerateDiagnostics():
                     cv2.putText(self.cv_image, text4%(self.steering_cmd, self.throttle_cmd, self.brake_cmd),  (self.img_vis_txt_x, self.img_vis_txt_y*5), font, self.img_vis_font_size, color, 2)
                     cv2.putText(self.cv_image, text5%(self.fwaypointx, self.fwaypointy, len(self.fwaypointsx)),  (self.img_vis_txt_x, self.img_vis_txt_y*6), font, self.img_vis_font_size, color, 2)
 
+                    # Output plots for velocity/steering/throttle/brake
                     fig, axes = plt.subplots(nrows = 1, ncols = 4, figsize=(16, 6), dpi=100)
                     axes[0].plot(self.frame_history,self.vel_history)
                     #axes.set_ylabel('Velocity')
