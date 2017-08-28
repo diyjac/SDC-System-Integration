@@ -29,6 +29,8 @@ class GenerateDiagnostics():
         self.camera_image = None
         self.lights = []
         self.i = 0
+        self.nwp = None
+        self.ctl = 0
 
         # lists for storing history values
         self.frame_history = []
@@ -50,8 +52,8 @@ class GenerateDiagnostics():
         self.bridge = CvBridge()
 
         # test different raw image update rates:
-        # - 2 - two frames a second # don't take too much resources away from the computer...
-        self.updateRate = 2 # 2Hz
+        # 1/2 - one frame every two seconds # don't take too much resources away from the computer...
+        self.updateRate = 0.5 # once every 2 seconds
 
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
@@ -65,6 +67,7 @@ class GenerateDiagnostics():
         self.img_ch = 3
         self.steering_cmd = 0.
         self.waypoints = None
+        self.traffic_light_to_waypoint_map = []
         self.fwaypointsx = []
         self.fwaypointsy = []
         self.fwaypointss = []
@@ -184,13 +187,13 @@ class GenerateDiagnostics():
 
     def pose_cb(self, msg):
         self.i += 1
-        self.pose = msg
-        self.position = self.pose.pose.position
+        self.pose = msg.pose
+        self.position = self.pose.position
         euler = tf.transformations.euler_from_quaternion([
-            self.pose.pose.orientation.x,
-            self.pose.pose.orientation.y,
-            self.pose.pose.orientation.z,
-            self.pose.pose.orientation.w])
+            self.pose.orientation.x,
+            self.pose.orientation.y,
+            self.pose.orientation.z,
+            self.pose.orientation.w])
         self.theta = euler[2]
 
     def velocity_cb(self, msg):
@@ -226,6 +229,22 @@ class GenerateDiagnostics():
             self.sub_waypoints.unregister()
             self.sub_waypoints = None
 
+            # initialize lights to waypoint map
+            self.initializeLightToWaypointMap()
+
+    def initializeLightToWaypointMap(self):
+        # find the closest waypoint to the given (x,y) of the triffic light
+        dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
+        for lidx in range(len(config.light_positions)):
+            dist = 100000.
+            tlwp = 0
+            for widx in range(len(self.waypoints)):
+                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                if dist > d1:
+                    tlwp = widx
+                    dist = d1
+            self.traffic_light_to_waypoint_map.append(tlwp)
+
     def fwaypoints_cb(self, msg):
         # DONE: Implement
         waypoints = []
@@ -242,25 +261,60 @@ class GenerateDiagnostics():
         self.fwaypointx = fx[0]
         self.fwaypointy = fy[0]
 
-    def dist_to_next_traffic_light(self):
+    def nextWaypoint(self, pose):
+        """Identifies the next path waypoint to the given position
+            https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
+        Args:
+            pose (Pose): position to match a waypoint to
+
+        Returns:
+            int: index of the next waypoint in self.waypoints
+
+        """
+        #DONE implement
+        location = pose.position
         dist = 100000.
-        dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        ctl = 0
-        for i in range(len(config.light_positions)):
-            d1 = dl(self.position, config.light_positions[i])
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        nwp = 0
+        for i in range(len(self.waypoints)):
+            d1 = dl(location, self.waypoints[i].pose.pose.position)
             if dist > d1:
-                ctl = i
+                nwp = i
                 dist = d1
-        x = config.light_positions[ctl][0]
-        y = config.light_positions[ctl][1]
-        heading = np.arctan2((y-self.position.y), (x-self.position.x))
+        x = self.waypoints[nwp].pose.pose.position.x
+        y = self.waypoints[nwp].pose.pose.position.y
+        heading = np.arctan2((y-location.y), (x-location.x))
         angle = np.abs(self.theta-heading)
         if angle > np.pi/4.:
-            ctl += 1
-            if ctl >= len(config.light_positions):
-                ctl = 0
-            dist = dl(self.position, config.light_positions[ctl])
-        self.ctl = ctl
+            nwp += 1
+            if nwp >= len(self.waypoints):
+                nwp = 0
+        return nwp
+
+    def getNextLightWaypoint(self):
+        # find the closest waypoint from our pre-populated waypoint to light map
+        tlwp = None
+        self.nwp = self.nextWaypoint(self.pose)
+        for ctl in range(len(self.traffic_light_to_waypoint_map)):
+            # make sure its forward in our direction
+            if self.nwp < self.traffic_light_to_waypoint_map[ctl] and tlwp is None:
+                tlwp = self.traffic_light_to_waypoint_map[ctl]
+                self.ctl = ctl
+        return tlwp
+
+    def distance(self, waypoints, wp1, wp2):
+        dist = 0
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        for i in range(wp1, wp2+1):
+            dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
+            wp1 = i
+        return dist
+
+    def dist_to_next_traffic_light(self):
+        dist = 0.
+        tlwp = self.getNextLightWaypoint()
+        if tlwp is not None:
+            dist = self.distance(self.waypoints, self.nwp, tlwp)
         return dist
 
     def drawWaypoints(self, img, size=5, size2=10):
@@ -338,22 +392,28 @@ class GenerateDiagnostics():
                     cv2.putText(self.cv_image, text5%(self.fwaypointx, self.fwaypointy, len(self.fwaypointsx)),  (self.img_vis_txt_x, self.img_vis_txt_y*6), font, self.img_vis_font_size, color, 2)
 
                     # Output plots for velocity/steering/throttle/brake but only if we have enough data points...
-                    mindata = min([len(self.frame_history), len(self.vel_history), len(self.steering_history), len(self.throttle_history), len(self.brake_history)])
+                    mindata = min([len(self.frame_history), len(self.vel_history), len(self.steering_history), len(self.throttle_history), len(self.brake_history)]) - 5
+                    brake_max = max(self.brake_history)
+                    right_axis_color = 'g'
+                    if brake_max > 10.:
+                        right_axis_color = 'r'
                     if mindata > self.max_history_size//2:
                         fig = plt.figure(figsize=(16, 6), dpi=100)
                         ax1 = fig.add_subplot(111)
-                        p1 = ax1.plot(self.frame_history[:mindata],self.vel_history[:mindata], color='c', label='Velocity')
+                        p1 = ax1.plot(self.frame_history[:mindata],self.vel_history[:mindata], color='c', label='Velocity (m/s)')
                         p2 = ax1.plot(self.frame_history[:mindata],self.steering_history[:mindata], color='b', label='Steering')
-                        ax1.set_ylabel('Velocity and Steering')
+                        ax1.set_ylabel('Velocity (m/s)\nSteering X 10', color='b')
+                        for tl in ax1.get_yticklabels():
+                            tl.set_color('b')
                         ax2 = ax1.twinx()
                         p3 = ax2.plot(self.frame_history[:mindata],self.brake_history[:mindata], 'r', label='Brake')
                         p4 = ax2.plot(self.frame_history[:mindata],self.throttle_history[:mindata], color='g', label='Throttle')
-                        ax2.set_ylabel('Throttle and Brake', color='r')
+                        ax2.set_ylabel('Throttle\nBrake', color=right_axis_color)
                         ps = p1 + p2 + p3 + p4
                         lps = [l.get_label() for l in ps]
                         plt.legend(ps, lps, loc=2)
                         for tl in ax2.get_yticklabels():
-                            tl.set_color('r')
+                            tl.set_color(right_axis_color)
 
                         fig.canvas.draw()
                         # Now we can save it to a numpy array.

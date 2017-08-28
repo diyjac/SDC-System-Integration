@@ -27,8 +27,8 @@ class TLDetector(object):
         self.camera_image = None
         self.lights = []
         self.updateRate = 2 # 2Hz
-        self.ctl = None
         self.nwp = None
+        self.traffic_light_to_waypoint_map = []
 
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -97,6 +97,9 @@ class TLDetector(object):
         self.sub_waypoints.unregister()
         self.sub_waypoints = None
 
+        # initialize lights to waypoint map
+        self.initializeLightToWaypointMap()
+
     def traffic_cb(self, msg):
         self.lights = msg.lights
 
@@ -130,6 +133,19 @@ class TLDetector(object):
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
 
+    def initializeLightToWaypointMap(self):
+        # find the closest waypoint to the given (x,y) of the triffic light
+        dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
+        for lidx in range(len(config.light_positions)):
+            dist = 100000.
+            tlwp = 0
+            for widx in range(len(self.waypoints)):
+                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                if dist > d1:
+                    tlwp = widx
+                    dist = d1
+            self.traffic_light_to_waypoint_map.append(tlwp)
+
     def nextWaypoint(self, pose):
         """Identifies the next path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
@@ -161,46 +177,22 @@ class TLDetector(object):
         return nwp
 
     def getNextLightWaypoint(self, number):
+        # find the closest waypoint from our pre-populated waypoint to traffic light map
+        tlwp = None
         light = None
-        dist = 100000.
-        dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        ctl = 0
-        for i in range(len(config.light_positions)):
-            d1 = dl(self.position, config.light_positions[i])
-            if dist > d1:
-                ctl = i
-                dist = d1
+        for i in range(len(self.traffic_light_to_waypoint_map)):
+            # make sure its forward in our direction
+            if self.nwp < self.traffic_light_to_waypoint_map[i] and tlwp is None:
+                tlwp = self.traffic_light_to_waypoint_map[i] - self.nwp
 
-        # make sure its the next one - ahead of us instead of behind us...
-        x = config.light_positions[ctl][0]
-        y = config.light_positions[ctl][1]
-        heading = np.arctan2((y-self.position.y), (x-self.position.x))
-        angle = np.abs(self.theta-heading)
-        if angle > np.pi/4.:
-            ctl += 1
-            if ctl >= len(config.light_positions):
-                ctl = 0
-            dist = dl(self.position, config.light_positions[ctl])
-        self.ctl = ctl
-
-        # now find the closest waypoint - if any within the number of waypoints ahead to check
-        dist = 100000.
-        tlwp = 0
-        for i in range(number):
-            d1 = dl(self.waypoints[(i+self.nwp)%self.wlen].pose.pose.position, config.light_positions[self.ctl])
-            if dist > d1:
-                tlwp = i
-                dist = d1
-
-        # is it within the given number?
-        if tlwp < number-2:
-            # is it within our traffic light tracking distance of 40 meters?
-            if self.distance(self.waypoints, self.ctl, (self.ctl+tlwp)%self.wlen) < 40.:
-                # set the traffic light waypoint target
-                # light = (self.nwp+tlwp)%self.wlen
-                # use relative waypoint ahead of current one instead!
-                light = tlwp
-
+                # is it within the given number?
+                if tlwp < number-2:
+                    # is it within our traffic light tracking distance of 40 meters?
+                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 40.:
+                        # set the traffic light waypoint target
+                        # light = (self.nwp+tlwp)%self.wlen
+                        # use relative waypoint ahead of current one instead!
+                        light = tlwp
         return light
 
     def project_to_image_plane(self, point_in_world):
