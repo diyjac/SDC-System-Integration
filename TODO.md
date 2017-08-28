@@ -6,3 +6,4 @@
 6. Start up GAN network semi-supervised learning training on available train, validate and test sets
 7. Integrate multiple `light_classification` solutions in their own local branches for integrated testing.
 8. Complete Development and Integration Test Report
+9. Submit Project
