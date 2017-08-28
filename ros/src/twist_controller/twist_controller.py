@@ -37,12 +37,12 @@ class Controller(object):
                 # throttle = self.pid.step(self.desired_linear_velocity, self.sample_time)
                 throttle = self.lowpass.filt(self.pid.step(self.desired_linear_velocity, self.sample_time))
                 if throttle < 0. and throttle < -self.brake_deadband:
-                    brake = -throttle * self.vehicle_mass * self.wheel_radius
+                    brake = abs(throttle * self.vehicle_mass * self.wheel_radius)
                     throttle = 0.
                 elif self.desired_linear_velocity < self.current_linear_velocity:
                     throttle = 0.
                     if self.current_linear_velocity <= self.min_speed:
-                        brake = -self.vehicle_mass * self.wheel_radius
+                        brake = abs(self.vehicle_mass * self.wheel_radius)
                     if self.current_linear_velocity == 0 and self.desired_linear_velocity > 0.:
                         brake = 0.
                 return throttle, brake, steer
