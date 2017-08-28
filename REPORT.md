@@ -83,3 +83,4 @@ Test drive to all intersections in simulator with traffic lights and test if sys
 As requested by Udacity, the system will stop Carla at the last waypoint, as shown below:
 
 ![./imgs/last_waypoint.jpg](./imgs/last_waypoint.jpg)
+

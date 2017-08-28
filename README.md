@@ -161,3 +161,12 @@ SDC System Integration Carla Test Course Map from rosbag sample:
 
 ![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
+11. Sample training, validation and testing images have been collected and are in [data/collections/samples](./data/collections/samples) directory.  There is a [session1.csv](./data/collections/samples/session1.csv) file that will provide the features and labels.  To collect additional training, validation and testing images for the traffic light classifier, use the `autoTLDataCollector.py` tool once you have started `roslaunch launch/styx.launch` and the simulator:
+
+```bash
+cd SDC-System-Integration
+mkdir data/collections/mysamples
+cd ros
+rosrun tools autoTLDataCollector.py mysamples/session1
+```
+![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)

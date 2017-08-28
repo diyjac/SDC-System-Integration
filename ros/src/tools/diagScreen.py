@@ -311,7 +311,7 @@ class GenerateDiagnostics():
         return dist
 
     def dist_to_next_traffic_light(self):
-        dist = 0.
+        dist = None
         tlwp = self.getNextLightWaypoint()
         if tlwp is not None:
             dist = self.distance(self.waypoints, self.nwp, tlwp)
@@ -366,7 +366,7 @@ class GenerateDiagnostics():
         while not rospy.is_shutdown():
             if self.theta is not None:
                 tl_dist = self.dist_to_next_traffic_light()
-                if self.sub_raw_camera is None:
+                if self.sub_raw_camera is None and tl_dist is not None:
                     if tl_dist < 80.:
                         self.sub_raw_camera = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
 
@@ -379,13 +379,17 @@ class GenerateDiagnostics():
                     self.drawCurrentPos(self.cv_image)
                     color = (192, 192, 0)
                     text0 = "Frame: %d"
-                    text1 = "Nearest Traffic Light (%d) is %fm ahead."
+                    text1a = "Nearest Traffic Light (%d) is %fm ahead."
+                    text1b = "Nearest Traffic Light (%d) is behind us."
                     text2 = "Curr. position is (%f, %f, %f)."
                     text3 = "Curr. Vehicle Yaw: %f    Linear Vel.: %f  Angular Vel.: %f"
                     text4 = "Curr. Steering Ang.: %f  Throttle: %f     Brake: %f"
                     text5 = "Next Waypoint position is (%f, %f) with %d array len."
                     cv2.putText(self.cv_image, text0%(self.i), (self.img_vis_txt_x,  self.img_vis_txt_y), font, self.img_vis_font_size, color, 2)
-                    cv2.putText(self.cv_image, text1%(self.ctl, tl_dist), (self.img_vis_txt_x,  self.img_vis_txt_y*2), font, self.img_vis_font_size, color, 2)
+                    if tl_dist is not None:
+                        cv2.putText(self.cv_image, text1a%(self.ctl, tl_dist), (self.img_vis_txt_x,  self.img_vis_txt_y*2), font, self.img_vis_font_size, color, 2)
+                    else:
+                        cv2.putText(self.cv_image, text1b%(self.ctl), (self.img_vis_txt_x,  self.img_vis_txt_y*2), font, self.img_vis_font_size, color, 2)
                     cv2.putText(self.cv_image, text2%(self.position.x, self.position.y, self.position.z),  (self.img_vis_txt_x,  self.img_vis_txt_y*3), font, self.img_vis_font_size, color, 2)
                     cv2.putText(self.cv_image, text3%(self.theta, self.current_linear_velocity, self.current_angular_velocity),  (self.img_vis_txt_x, self.img_vis_txt_y*4), font, self.img_vis_font_size, color, 2)
                     cv2.putText(self.cv_image, text4%(self.steering_cmd, self.throttle_cmd, self.brake_cmd),  (self.img_vis_txt_x, self.img_vis_txt_y*5), font, self.img_vis_font_size, color, 2)
