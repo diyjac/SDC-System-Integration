@@ -22,7 +22,9 @@ import rosbag
 import datetime
 import cStringIO
 import serialrosbags
+import cv2
 from cv_bridge import CvBridge
+import tensorflow as tf
 
 #from keras.models import model_from_json
 
@@ -31,6 +33,27 @@ size = None
 width = None
 height = None
 screen = None
+
+label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
+
+def scale(x, feature_range=(-1, 1)):
+    """Rescale the image pixel values from -1 to 1
+
+    Args:
+        image (cv::Mat): image containing the traffic light
+
+    Returns:
+        image (cv::Mat): image rescaled from -1 to 1 pixel values
+
+    """
+    # scale to (-1, 1)
+    x = ((x - x.min())/(255 - x.min()))
+
+    # scale to feature_range
+    min, max = feature_range
+    x = x * (max - min) + min
+    return x
+
 
 # ***** main loop *****
 if __name__ == "__main__":
@@ -48,6 +71,21 @@ if __name__ == "__main__":
 
   bridge = CvBridge()
   bags = serialrosbags.Bags(datasets, ['/current_pose','/image_raw'])
+
+  # get the traffic light classifier
+  model_path = '../classifier/GAN-Semi-Supervised-site'
+  config = tf.ConfigProto(log_device_placement=True)
+  config.gpu_options.per_process_gpu_memory_fraction = 0.2  # don't hog all the VRAM!
+  config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
+  sess = tf.Session(config=self.config)
+  saver = tf.train.import_meta_graph(model_path + '/checkpoints/generator.ckpt.meta')
+  saver.restore(sess,tf.train.latest_checkpoint(model_path + '/checkpoints/'))
+
+  # get the tensors we need for doing the predictions by name
+  tf_graph = tf.get_default_graph()
+  input_real = tf_graph.get_tensor_by_name("input_real:0")
+  drop_rate = tf_graph.get_tensor_by_name("drop_rate:0")
+  predict = tf_graph.get_tensor_by_name("predict:0")
 
   while bags.has_data():
     try:
@@ -77,6 +115,16 @@ if __name__ == "__main__":
                 print "size: ", size
 
               img = bridge.imgmsg_to_cv2(msg, "rgb8")
+              if height != 600 or width != 800:
+                img2 = cv2.resize(bridge.imgmsg_to_cv2(msg, "rgb8"), (800, 600), interpolation=cv2.INTER_AREA)
+              pred = sess.run(predict, feed_dict = {
+                input_real: scale(img2.reshape(-1, 600, 800, 3)),
+                drop_rate:0.})
+
+              color = (192, 192, 0)
+              text = 'Most Likely: %s'
+              font = cv2.FONT_HERSHEY_COMPLEX
+              cv2.putText(img, text%(label[pred[0]]), (100, height-60), font, 1, color, 2)
               sim_img = pygame.image.fromstring(img.tobytes(), size, 'RGB')
 
               screen.blit(sim_img, (0,0))

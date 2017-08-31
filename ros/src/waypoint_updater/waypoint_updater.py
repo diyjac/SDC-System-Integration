@@ -64,8 +64,9 @@ class WaypointUpdater(object):
         self.theta = None
         self.waypoints = None
         self.cwp = None
-        self.redtlwp = -1
+        self.redtlwp = None
         self.i = 0
+        self.go_timer = 0
         self.state = INIT
 
         # start the loop
@@ -76,10 +77,8 @@ class WaypointUpdater(object):
         self.restricted_speed -= 1.0
         rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
-            if self.waypoints and self.theta:
+            if self.waypoints and self.theta and self.state != INIT:
                 self.cwp = self.nextWaypoint()
-                print self.i, "self.cwp:", self.cwp
-                print ""
                 self.getWaypoints(LOOKAHEAD_WPS)
                 self.publish()
             rate.sleep()
@@ -96,6 +95,8 @@ class WaypointUpdater(object):
             self.orientation.z,
             self.orientation.w])
         self.theta = euler[2]
+        if self.state == INIT:
+            print "INITIALIZING TRAFFIC LIGHT DETECTOR...."
 
     def velocity_cb(self, msg):
         self.current_linear_velocity = msg.twist.linear.x
@@ -126,8 +127,9 @@ class WaypointUpdater(object):
 
     def distanceToREDTrafficLight(self):
         dist = None
-        if self.redtlwp > 0:
-            dist = self.distance(self.waypoints, self.cwp, self.cwp+self.redtlwp)
+        if self.redtlwp is not None:
+            if self.redtlwp > 0:
+                dist = self.distance(self.waypoints, self.cwp, self.cwp+self.redtlwp)
         return dist
 
     def getWaypoints(self, number):
@@ -151,6 +153,9 @@ class WaypointUpdater(object):
         polynomial = np.poly1d(poly)
         mps = 0.44704
         velocity = 0.
+
+        if self.go_timer > 0:
+            self.go_timer -= 1
 
         if self.current_linear_velocity < 0.01:
             self.state = STOP
@@ -185,6 +190,8 @@ class WaypointUpdater(object):
 
         # if no traffic light 
         elif tl_dist is None:
+            if self.state != GO and self.state != GOFROMSTOP:
+                self.go_timer = 20
             self.state = GO
             # calculate normal trajectory
             for i in range(len(vptsx)):
@@ -192,13 +199,13 @@ class WaypointUpdater(object):
                 self.final_waypoints[i].twist.twist.angular.z = cte
             velocity = self.final_waypoints[0].twist.twist.linear.x
 
-        # we are stopped and more than 6 meters from a red light
+        # we are stopped and more than 8 meters from a red light
         # elif tl_dist is not None and (self.state == STOP or self.state == GOFROMSTOP) and tl_dist > 2.:
-        elif tl_dist is not None and tl_dist > 6.0:
+        elif tl_dist is not None and tl_dist > 8.0 and self.go_timer == 0:
             self.state = GOFROMSTOP
             # calculate start and stop trajectory
             if tl_dist > 10.0:
-                wpx = [0, self.redtlwp//3, self.redtlwp//2, self.redtlwp, len(vptsx)]
+                wpx = [0, self.redtlwp//5, self.redtlwp//3, self.redtlwp, len(vptsx)]
                 wpy = [self.restricted_speed*mps/2, self.restricted_speed*mps, self.restricted_speed*mps/2, 0.0, 0.0]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 3)
                 polynomial2 = np.poly1d(poly2)
@@ -261,7 +268,7 @@ class WaypointUpdater(object):
 
             velocity = polynomial2([0])[0]
 
-        elif tl_dist is not None and self.state != STOP:
+        elif tl_dist is not None and self.state != STOP and self.go_timer == 0:
             if self.current_linear_velocity < 0.5:
                 wpx = [0, self.redtlwp, len(vptsx)]
                 wpy = [-1., -1., -1.]
@@ -423,7 +430,7 @@ class WaypointUpdater(object):
     def traffic_cb(self, msg):
         # DONE: Callback for /traffic_waypoint message. Implement
         self.redtlwp = msg.data
-        if self.state == INIT:
+        if self.state == INIT and self.i > 350:
             self.state = STOP
 
     def traffic_light_cb(self, msg):
