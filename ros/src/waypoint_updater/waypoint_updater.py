@@ -269,6 +269,7 @@ class WaypointUpdater(object):
             velocity = polynomial2([0])[0]
 
         elif tl_dist is not None and self.state != STOP and self.go_timer == 0:
+            self.state = STOPPING
             if self.current_linear_velocity < 0.5:
                 wpx = [0, self.redtlwp, len(vptsx)]
                 wpy = [-1., -1., -1.]
@@ -276,17 +277,17 @@ class WaypointUpdater(object):
                 polynomial2 = np.poly1d(poly2)
             elif self.current_linear_velocity < 1.:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-2., -2., -2.]
+                wpy = [-10., -10., -10.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
             elif self.current_linear_velocity < 2.:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-10., -10., -10.]
+                wpy = [-20., -20., -20.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
             elif self.current_linear_velocity < 3.:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-20., -20., -20.]
+                wpy = [-30., -30., -30.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
             else:
