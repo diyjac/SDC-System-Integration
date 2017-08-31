@@ -211,10 +211,10 @@ ________________________________________________________________________________
     flatten (Flatten)                (None, 4)             0           avgpool10[0][0]                  
     ____________________________________________________________________________________________________
     softmax (Activation)             (None, 4)             0           flatten[0][0]                    
-====================================================================================================
-Total params: 737,476
-Trainable params: 737,476
-Non-trainable params: 0
+    ====================================================================================================
+    Total params: 737,476
+    Trainable params: 737,476
+    Non-trainable params: 0
 ____________________________________________________________________________________________________
 
 
@@ -264,6 +264,8 @@ This image shows the problem, only one traffic light was detected of 3 being pre
 ![traffic light][yolosample2]
 
 [yolosample2]: https://github.com/diyjac/SDC-System-Integration/blob/rainer-prerelease/classifier/output/yolo-v2/07_green_SantaClara.jpg
+
+This behavior resulted in not following this approach further.
 
 ## 2.3 Color Classifier
 
