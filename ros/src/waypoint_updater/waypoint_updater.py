@@ -66,6 +66,7 @@ class WaypointUpdater(object):
         self.cwp = None
         self.redtlwp = None
         self.i = 0
+        self.go_timer = 0
         self.state = INIT
 
         # start the loop
@@ -153,6 +154,9 @@ class WaypointUpdater(object):
         mps = 0.44704
         velocity = 0.
 
+        if self.go_timer > 0:
+            self.go_timer -= 1
+
         if self.current_linear_velocity < 0.01:
             self.state = STOP
 
@@ -186,6 +190,8 @@ class WaypointUpdater(object):
 
         # if no traffic light 
         elif tl_dist is None:
+            if self.state != GO and self.state != GOFROMSTOP:
+                self.go_timer = 20
             self.state = GO
             # calculate normal trajectory
             for i in range(len(vptsx)):
@@ -193,13 +199,13 @@ class WaypointUpdater(object):
                 self.final_waypoints[i].twist.twist.angular.z = cte
             velocity = self.final_waypoints[0].twist.twist.linear.x
 
-        # we are stopped and more than 6 meters from a red light
+        # we are stopped and more than 8 meters from a red light
         # elif tl_dist is not None and (self.state == STOP or self.state == GOFROMSTOP) and tl_dist > 2.:
-        elif tl_dist is not None and tl_dist > 6.0:
+        elif tl_dist is not None and tl_dist > 8.0 and self.go_timer == 0:
             self.state = GOFROMSTOP
             # calculate start and stop trajectory
             if tl_dist > 10.0:
-                wpx = [0, self.redtlwp//3, self.redtlwp//2, self.redtlwp, len(vptsx)]
+                wpx = [0, self.redtlwp//5, self.redtlwp//3, self.redtlwp, len(vptsx)]
                 wpy = [self.restricted_speed*mps/2, self.restricted_speed*mps, self.restricted_speed*mps/2, 0.0, 0.0]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 3)
                 polynomial2 = np.poly1d(poly2)
@@ -262,7 +268,7 @@ class WaypointUpdater(object):
 
             velocity = polynomial2([0])[0]
 
-        elif tl_dist is not None and self.state != STOP:
+        elif tl_dist is not None and self.state != STOP and self.go_timer == 0:
             if self.current_linear_velocity < 0.5:
                 wpx = [0, self.redtlwp, len(vptsx)]
                 wpy = [-1., -1., -1.]
