@@ -276,22 +276,22 @@ class WaypointUpdater(object):
                 polynomial2 = np.poly1d(poly2)
             elif self.current_linear_velocity < 1.:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-4., -4., -4.]
+                wpy = [-2., -2., -2.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
             elif self.current_linear_velocity < 2.:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-20., -20., -20.]
+                wpy = [-10., -10., -10.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
             elif self.current_linear_velocity < 3.:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-40., -40., -40.]
+                wpy = [-20., -20., -20.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
             else:
                 wpx = [0, self.redtlwp, len(vptsx)]
-                wpy = [-80., -80., -80.]
+                wpy = [-40., -40., -40.]
                 poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
                 polynomial2 = np.poly1d(poly2)
 
