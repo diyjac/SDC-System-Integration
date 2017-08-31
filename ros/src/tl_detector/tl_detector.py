@@ -13,6 +13,8 @@ import tf
 import cv2
 from traffic_light_config import config
 
+label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
+
 STATE_COUNT_THRESHOLD = 3
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. (reduce our waypoint search).
 
@@ -23,6 +25,8 @@ class TLDetector(object):
         self.pose = None
         self.theta = None
         self.waypoints = None
+        self.row = 600
+        self.col = 800
         self.wlen = 0
         self.camera_image = None
         self.lights = []
@@ -40,15 +44,12 @@ class TLDetector(object):
         help you work on another single component of the node. This topic won't be available when
         testing your solution in real life so don't rely on it in the final submission.
         '''
-        # self.sub_temp_lights = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
-        # self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
         self.sub_raw_image = None
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier()
-        self.listener = tf.TransformListener()
+        self.light_classifier = TLClassifier(rospy.get_param('~model_path'))
 
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
@@ -84,6 +85,8 @@ class TLDetector(object):
             self.orientation.z,
             self.orientation.w])
         self.theta = euler[2]
+        if self.light_classifier.predict is None:
+            print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR...."
 
     def waypoints_cb(self, msg):
         # make our own copy of the waypoints - they are static and do not change
@@ -113,6 +116,8 @@ class TLDetector(object):
         """
         self.has_image = True
         self.camera_image = msg
+        self.row = int(msg.height)
+        self.col = int(msg.width)
         light_wp, state = self.process_traffic_lights()
 
         '''
@@ -195,43 +200,6 @@ class TLDetector(object):
                         light = tlwp
         return light
 
-    def project_to_image_plane(self, point_in_world):
-        """Project point from 3D world coordinates to 2D camera image location
-
-        Args:
-            point_in_world (Point): 3D location of a point in the world
-
-        Returns:
-            x (int): x coordinate of target point in image
-            y (int): y coordinate of target point in image
-
-        """
-
-        fx = config.camera_info.focal_length_x
-        fy = config.camera_info.focal_length_y
-
-        image_width = config.camera_info.image_width
-        image_height = config.camera_info.image_height
-
-        # get transform between pose of camera and world frame
-        trans = None
-        try:
-            now = rospy.Time.now()
-            self.listener.waitForTransform("/base_link",
-                  "/world", now, rospy.Duration(1.0))
-            (trans, rot) = self.listener.lookupTransform("/base_link",
-                  "/world", now)
-
-        except (tf.Exception, tf.LookupException, tf.ConnectivityException):
-            rospy.logerr("Failed to find camera to map transform")
-
-        #TODO Use tranform and rotation to calculate 2D position of light in image
-
-        x = 0
-        y = 0
-
-        return (x, y)
-
     def get_light_state(self, light):
         """Determines the current color of the traffic light
 
@@ -244,17 +212,19 @@ class TLDetector(object):
         """
         if(not self.has_image):
             self.prev_light_loc = None
-            return False
+            return TrafficLight.RED
 
         self.camera_image.encoding = "rgb8"
-        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-
-        x, y = self.project_to_image_plane(light.pose.pose.position)
-
-        #TODO use light location to zoom in on traffic light in image
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
+        if self.row != 600 or self.col != 800:
+            image = cv2.resize(cv_image, (800, 600), interpolation=cv2.INTER_AREA)
+        else:
+            image = np.copy(cv_image)
 
         #Get classification
-        return self.light_classifier.get_classification(cv_image)
+        classification = self.light_classifier.get_classification(image)
+        print "traffic light: ", label[classification]
+        return classification
 
     def distance(self, waypoints, wp1, wp2):
         dist = 0
@@ -275,9 +245,7 @@ class TLDetector(object):
         """
         #DONE find the closest visible traffic light (if one exists within LOOKAHEAD_WPS)
         if self.ntlwp:
-            # force to RED for now!
-            # state = self.get_light_state(self.ntlwp)
-            state = TrafficLight.RED
+            state = self.get_light_state(self.ntlwp)
             return self.ntlwp, state
         return -1, TrafficLight.UNKNOWN
 

@@ -13,5 +13,5 @@
     <include file="$(find waypoint_updater)/launch/waypoint_updater.launch"/>
 
     <!--Traffic Light Detector Node -->
-    <include file="$(find tl_detector)/launch/tl_detector.launch"/>
+    <include file="$(find tl_detector)/launch/tl_site_detector.launch"/>
 </launch>
