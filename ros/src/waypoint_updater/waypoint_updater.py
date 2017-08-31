@@ -64,7 +64,7 @@ class WaypointUpdater(object):
         self.theta = None
         self.waypoints = None
         self.cwp = None
-        self.redtlwp = -1
+        self.redtlwp = None
         self.i = 0
         self.state = INIT
 
@@ -76,10 +76,8 @@ class WaypointUpdater(object):
         self.restricted_speed -= 1.0
         rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
-            if self.waypoints and self.theta:
+            if self.waypoints and self.theta and self.state != INIT:
                 self.cwp = self.nextWaypoint()
-                print self.i, "self.cwp:", self.cwp
-                print ""
                 self.getWaypoints(LOOKAHEAD_WPS)
                 self.publish()
             rate.sleep()
@@ -96,6 +94,8 @@ class WaypointUpdater(object):
             self.orientation.z,
             self.orientation.w])
         self.theta = euler[2]
+        if self.state == INIT:
+            print "INITIALIZING TRAFFIC LIGHT DETECTOR...."
 
     def velocity_cb(self, msg):
         self.current_linear_velocity = msg.twist.linear.x
@@ -126,8 +126,9 @@ class WaypointUpdater(object):
 
     def distanceToREDTrafficLight(self):
         dist = None
-        if self.redtlwp > 0:
-            dist = self.distance(self.waypoints, self.cwp, self.cwp+self.redtlwp)
+        if self.redtlwp is not None:
+            if self.redtlwp > 0:
+                dist = self.distance(self.waypoints, self.cwp, self.cwp+self.redtlwp)
         return dist
 
     def getWaypoints(self, number):
@@ -423,7 +424,7 @@ class WaypointUpdater(object):
     def traffic_cb(self, msg):
         # DONE: Callback for /traffic_waypoint message. Implement
         self.redtlwp = msg.data
-        if self.state == INIT:
+        if self.state == INIT and self.i > 350:
             self.state = STOP
 
     def traffic_light_cb(self, msg):

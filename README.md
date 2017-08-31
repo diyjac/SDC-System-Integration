@@ -81,6 +81,7 @@ cd SDC-System-Integration
         sudo -H pip install -r requirements-pygame.txt
         ```
     * For GPU Linux systems
+        __NOTE__: Make sure to install CUDA and its dependencies!  [http://www.nvidia.com/object/gpu-accelerated-applications-tensorflow-installation.html](http://www.nvidia.com/object/gpu-accelerated-applications-tensorflow-installation.html)
         ```bash
         sudo -H pip install -r requirements-gpu-pygame.txt
         ```
@@ -90,6 +91,7 @@ cd SDC-System-Integration
         pip install -r requirements.txt
         ```
     * For GPU Linux systems
+        __NOTE__: Make sure to install CUDA and its dependencies!  [http://www.nvidia.com/object/gpu-accelerated-applications-tensorflow-installation.html](http://www.nvidia.com/object/gpu-accelerated-applications-tensorflow-installation.html)
         ```bash
         pip install -r requirements-gpu.txt
         ```
