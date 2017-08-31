@@ -1,6 +1,6 @@
 # Traffic Classifier README.md
 ---
-This document describes ideas and test performed for preparation of the traffic. Lights classifier.
+This document describes ideas and tests performed for preparation of the traffic lights classifier.
 
 
 ## 1. Datasets
@@ -35,7 +35,7 @@ These images have been used during the initial phase of development but hove bee
 
 ### 1.4 [Udacity Camera Feed](https://carnd.slack.com/archives/C6NVDVAQ3/p1503614726000196)
 
-These images become available on August 24th over the slack channel #p-system-integration. It contains two bag files with an image feed from the Udacity self-driving car's camera in the test lot and a topic containing the car's position at [google drive](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing).
+These images became available on August 24th over the slack channel #p-system-integration. It contains two bag files with an image feed from the Udacity self-driving car's camera in the test lot and a topic containing the car's position at [google drive](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing).
 
 Caleb Kirksey: "The video has some shots of the traffic light that we'll be using in testing. I'll follow up with the relative location of the traffic light as well as more images of the light for training a neural net."
 
@@ -52,7 +52,7 @@ Caleb Kirksey: "The video has some shots of the traffic light that we'll be usin
 
 ## 2.1 Traffic Light Color Classifier Notebook
 
-This is a small Jupiter notebook for testing the approach of [this ROS node] (https://github.com/cena0805/ros-traffic-light-classifier).
+This is a small Jupiter notebook for testing the approach of [this ROS node](https://github.com/cena0805/ros-traffic-light-classifier).
 
 Downloading the original trained network and applying it on the test data set shows almost the same accuracy of 50% over all classes. Strange was the fact that the training accuracy was 97%. Due to availability of just a cpu and no  gnu further training with more epochs could not be performed in the remote region of development at the time being.
 
@@ -132,17 +132,17 @@ ________________________________________________________________________________
     ____________________________________________________________________________________________________
     fire2_expand2 (Conv2D)           (None, 55, 55, 64)    9280        fire2_squeeze[0][0]              
     ____________________________________________________________________________________________________
-    merge_1 (Merge)                  (None, 55, 55, 128)   0               fire2_expand1[0][0]              
-                                                                   fire2_expand2[0][0]              
+    merge_1 (Merge)                  (None, 55, 55, 128)   0           fire2_expand1[0][0]              
+                                                                       fire2_expand2[0][0]              
     ____________________________________________________________________________________________________
     fire3_squeeze (Conv2D)           (None, 55, 55, 16)    2064        merge_1[0][0]                    
     ____________________________________________________________________________________________________
     fire3_expand1 (Conv2D)           (None, 55, 55, 64)    1088        fire3_squeeze[0][0]              
     ____________________________________________________________________________________________________
-    fire3_expand2 (Conv2D)           (None, 55, 55, 64)    s9280        fire3_squeeze[0][0]              
+    fire3_expand2 (Conv2D)           (None, 55, 55, 64)    s9280       fire3_squeeze[0][0]              
     ____________________________________________________________________________________________________
     merge_2 (Merge)                  (None, 55, 55, 128)   0           fire3_expand1[0][0]              
-                                                                   fire3_expand2[0][0]              
+                                                                       fire3_expand2[0][0]              
     ____________________________________________________________________________________________________
     fire4_squeeze (Conv2D)           (None, 55, 55, 32)    4128        merge_2[0][0]                    
     ____________________________________________________________________________________________________
@@ -151,7 +151,7 @@ ________________________________________________________________________________
     fire4_expand2 (Conv2D)           (None, 55, 55, 128)   36992       fire4_squeeze[0][0]              
     ____________________________________________________________________________________________________
     merge_3 (Merge)                  (None, 55, 55, 256)   0           fire4_expand1[0][0]              
-                                                                   fire4_expand2[0][0]              
+                                                                       fire4_expand2[0][0]              
     ____________________________________________________________________________________________________
     maxpool4 (MaxPooling2D)          (None, 27, 27, 256)   0           merge_3[0][0]                    
     ____________________________________________________________________________________________________
@@ -161,17 +161,17 @@ ________________________________________________________________________________
     ____________________________________________________________________________________________________
     fire5_expand2 (Conv2D)           (None, 27, 27, 128)   36992       fire5_squeeze[0][0]              
     ____________________________________________________________________________________________________
-    merge_4 (Merge)                  (None, 27, 27, 256)   0               fire5_expand1[0][0]              
-                                                                   fire5_expand2[0][0]              
-        ______________________________________________________________________________    ______________________
+    merge_4 (Merge)                  (None, 27, 27, 256)   0           fire5_expand1[0][0]              
+                                                                       fire5_expand2[0][0]              
+    ____________________________________________________________________________________________________
     fire6_squeeze (Conv2D)           (None, 27, 27, 48)    12336       merge_4[0][0]                    
     ____________________________________________________________________________________________________
     fire6_expand1 (Conv2D)           (None, 27, 27, 192)   9408        fire6_squeeze[0][0]              
     ____________________________________________________________________________________________________
-    fire6_expand2 (Conv2D)           (None, 27, 27, 192)   83136           fire6_squeeze[0][0]              
+    fire6_expand2 (Conv2D)           (None, 27, 27, 192)   83136       fire6_squeeze[0][0]              
     ____________________________________________________________________________________________________
-    merge_5 (Merge)                  (None, 27, 27, 384)   0               fire6_expand1[0][0]              
-                                                                   fire6_expand2[0][0]              
+    merge_5 (Merge)                  (None, 27, 27, 384)   0           fire6_expand1[0][0]              
+                                                                       fire6_expand2[0][0]              
     ______________________________________________________________________________ ______________________
     fire7_squeeze (Conv2D)           (None, 27, 27, 48)    18480       merge_5[0][0]                    
     ____________________________________________________________________________________________________
@@ -180,7 +180,7 @@ ________________________________________________________________________________
     fire7_expand2 (Conv2D)           (None, 27, 27, 192)   83136       fire7_squeeze[0][0]              
     ____________________________________________________________________________________________________
     merge_6 (Merge)                  (None, 27, 27, 384)   0           fire7_expand1[0][0]              
-                                                                   fire7_expand2[0][0]              
+                                                                       fire7_expand2[0][0]              
     ____________________________________________________________________________________________________
     fire8_squeeze (Conv2D)           (None, 27, 27, 64)    24640       merge_6[0][0]                    
     ____________________________________________________________________________________________________
@@ -189,7 +189,7 @@ ________________________________________________________________________________
     fire8_expand2 (Conv2D)           (None, 27, 27, 256)   147712      fire8_squeeze[0][0]              
     ____________________________________________________________________________________________________
     merge_7 (Merge)                  (None, 27, 27, 512)   0           fire8_expand1[0][0]              
-                                                                   fire8_expand2[0][0]              
+                                                                       fire8_expand2[0][0]              
     ____________________________________________________________________________________________________
     maxpool8 (MaxPooling2D)          (None, 13, 13, 512)   0           merge_7[0][0]                    
     ____________________________________________________________________________________________________
@@ -200,7 +200,7 @@ ________________________________________________________________________________
     fire9_expand2 (Conv2D)           (None, 13, 13, 256)   147712      fire9_squeeze[0][0]              
     ____________________________________________________________________________________________________
     merge_8 (Merge)                  (None, 13, 13, 512)   0           fire9_expand1[0][0]              
-                                                                   fire9_expand2[0][0]              
+                                                                       fire9_expand2[0][0]              
     ____________________________________________________________________________________________________
     fire9_dropout (Dropout)          (None, 13, 13, 512)   0           merge_8[0][0]                    
     ____________________________________________________________________________________________________
@@ -255,8 +255,15 @@ Test accuracy is determined for predicting a completly unseen test dataset split
     3. ./flow --test /Users/rainerbareiss/Downloads/traffic_light_images/PATH --model cfg/tiny-yolo-udacity.cfg --load 8987 --json
     4. ./flow --test test/ --model cfg/tiny-yolo-udacity.cfg --load 8987
     
+The following image shows a sample picture where yolo detected two cars on the other lane and a traffic light. 
+![traffic light][yolosample1]
 
-Other link to yolo is https://github.com/udacity/self-driving-car/tree/master/vehicle-detection/darkflow/net. This is based on pytho3 and tensor flow 1.2.
+[yolosample1]: https://github.com/diyjac/SDC-System-Integration/blob/rainer-prerelease/classifier/output/yolo-v2/04_green_Intra640.jpg
+
+This image shows the problem, only one traffic light was detected of 3 being present. 
+![traffic light][yolosample2]
+
+[yolosample2]: https://github.com/diyjac/SDC-System-Integration/blob/rainer-prerelease/classifier/output/yolo-v2/07_green_SantaClara.jpg
 
 ## 2.3 Color Classifier
 
