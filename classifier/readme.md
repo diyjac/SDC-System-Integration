@@ -31,7 +31,7 @@ These [images are cropped](https://github.com/cena0805/ros-traffic-light-classif
 | /test/green    | 1165    |  
 | /test/unknown  | 5823    | 
 
-These images have been used during the initial phase of development but hove been omitted after realizing that we need to classify a full image containing the traffic light and not only a cropped part of it containing just the traffic light itself.
+These images have been used during the initial phase of development but have been omitted after realizing that we need to classify a full image containing the traffic light and not only a cropped part of it containing just the traffic light itself.
 
 ### 1.4 [Udacity Camera Feed](https://carnd.slack.com/archives/C6NVDVAQ3/p1503614726000196)
 
@@ -65,7 +65,7 @@ For completeness here the results:
 Two models have been used. 
 
 #### Model 1
-The [original model] (https://github.com/cena0805/ros-traffic-light-classifier) is shown here:
+The [original model](https://github.com/cena0805/ros-traffic-light-classifier) is shown here:
 
     ____________________________________________________________________________________________________
     
