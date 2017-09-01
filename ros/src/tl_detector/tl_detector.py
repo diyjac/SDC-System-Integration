@@ -51,10 +51,13 @@ class TLDetector(object):
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier(rospy.get_param('~model_path'))
 
+        self.init = True
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
+        self.ntlwp = None
+        self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
 
         # don't spin - control our resource usage!
         self.loop()
@@ -63,16 +66,17 @@ class TLDetector(object):
         # throttle our traffic light lookup until we are within range
         rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
-            if self.waypoints and self.theta:
-                self.nwp = self.nextWaypoint(self.pose)
-                self.ntlwp = self.getNextLightWaypoint(LOOKAHEAD_WPS)
-                if self.ntlwp is not None and self.sub_raw_image is None:
-                    self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
-                elif self.ntlwp is None and self.sub_raw_image is not None:
-                    self.sub_raw_image.unregister()
-                    self.sub_raw_image = None
-                    self.last_wp = -1
-                    self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+            if not self.init:
+                if self.waypoints and self.theta:
+                    self.nwp = self.nextWaypoint(self.pose)
+                    self.ntlwp = self.getNextLightWaypoint(LOOKAHEAD_WPS)
+                    if self.ntlwp is not None and self.sub_raw_image is None:
+                        self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                    elif self.ntlwp is None and self.sub_raw_image is not None:
+                        self.sub_raw_image.unregister()
+                        self.sub_raw_image = None
+                        self.last_wp = -1
+                        self.upcoming_red_light_pub.publish(Int32(self.last_wp))
             rate.sleep()
 
     def pose_cb(self, msg):
@@ -137,6 +141,8 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
+        if self.init:
+            self.init = False
 
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
@@ -192,8 +198,8 @@ class TLDetector(object):
 
                 # is it within the given number?
                 if tlwp < number-2:
-                    # is it within our traffic light tracking distance of 40 meters?
-                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 40.:
+                    # is it within our traffic light tracking distance of 60 meters?
+                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 80.:
                         # set the traffic light waypoint target
                         # light = (self.nwp+tlwp)%self.wlen
                         # use relative waypoint ahead of current one instead!
@@ -244,8 +250,12 @@ class TLDetector(object):
 
         """
         #DONE find the closest visible traffic light (if one exists within LOOKAHEAD_WPS)
-        if self.ntlwp:
+        if self.init:
+            state = self.get_light_state(0)
+            return -1, TrafficLight.UNKNOWN
+        elif self.ntlwp:
             state = self.get_light_state(self.ntlwp)
+            # state = TrafficLight.RED
             return self.ntlwp, state
         return -1, TrafficLight.UNKNOWN
 
