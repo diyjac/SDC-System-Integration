@@ -172,3 +172,14 @@ cd ros
 rosrun tools autoTLDataCollector.py mysamples/session1
 ```
 ![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)
+
+The ROS Graph was updated as follows  
+
+![./imgs/ros-graph-update.png](./imgs/ros-graph-update.png)
+
+as we were informed by Udacity 
+
+![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
+
+that the obstacle node is currently not implemented in the simulator. 
+
