@@ -1,8 +1,8 @@
 ### TODO
-1. Issue 2. "Velocity should be capped using waypoint_loader and not waypoint_updater"
-2. Issue 3. "Stopping for Traffic Light not working all that well"
-3. Issue 5. "If I restart styx when the car is in the middle of the track (not the starting point) then the car doesn't move at all"
-4. Issue 6. "I don't see brake command being sent at all (Except for the first Traffic Light)"
+1. ~~Issue 2. "Velocity should be capped using waypoint_loader and not waypoint_updater"~~
+2. Issue 3. "Stopping for Traffic Light not working all that well" (John)
+3. Issue 5. "If I restart styx when the car is in the middle of the track (not the starting point) then the car doesn't move at all" (Rainer + x)
+4. ~~Issue 6. "I don't see brake command being sent at all (Except for the first Traffic Light)"~~
 9. Resubmit Project
 
 
