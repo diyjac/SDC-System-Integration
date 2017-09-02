@@ -175,7 +175,7 @@ rosrun tools autoTLDataCollector.py mysamples/session1
 
 The ROS Graph was updated as follows  
 
-![./imgs/ros-graph-update.png](./imgs/ros-graph-update.png)
+![.imgs/Pasted%20image%20at%202017_09_02%2001_31%20PM.pn](.imgs/Pasted%20image%20at%202017_09_02%2001_31%20PM.png)
 
 as we were informed by Udacity 
 
