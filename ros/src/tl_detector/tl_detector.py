@@ -15,7 +15,7 @@ from traffic_light_config import config
 
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 10
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. (reduce our waypoint search).
 
 class TLDetector(object):
@@ -30,7 +30,7 @@ class TLDetector(object):
         self.wlen = 0
         self.camera_image = None
         self.lights = []
-        self.updateRate = 2 # 2Hz
+        self.updateRate = 10 # 10Hz
         self.nwp = None
         self.traffic_light_to_waypoint_map = []
 
@@ -135,6 +135,7 @@ class TLDetector(object):
             self.state = state
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
+            # light_wp = light_wp if state == TrafficLight.RED else -1
             light_wp = light_wp if state == TrafficLight.RED or state == TrafficLight.YELLOW else -1
             self.last_wp = light_wp
             self.upcoming_red_light_pub.publish(Int32(light_wp))
@@ -199,7 +200,7 @@ class TLDetector(object):
                 # is it within the given number?
                 if tlwp < number-2:
                     # is it within our traffic light tracking distance of 60 meters?
-                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 80.:
+                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 90.:
                         # set the traffic light waypoint target
                         # light = (self.nwp+tlwp)%self.wlen
                         # use relative waypoint ahead of current one instead!

@@ -34,8 +34,8 @@ class Controller(object):
                 self.desired_angular_velocity = args[1]
                 steer = self.desired_angular_velocity * self.steer_ratio
                 brake = 0.
-                # throttle = self.pid.step(self.desired_linear_velocity, self.sample_time)
-                throttle = self.lowpass.filt(self.pid.step(self.desired_linear_velocity, self.sample_time))
+                throttle = self.pid.step(self.desired_linear_velocity, self.sample_time)
+                # throttle = self.lowpass.filt(self.pid.step(self.desired_linear_velocity, self.sample_time))
                 if throttle < 0. and throttle < -self.brake_deadband:
                     brake = abs(throttle * self.vehicle_mass * self.wheel_radius)
                     throttle = 0.
