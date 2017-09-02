@@ -279,6 +279,7 @@ Applying a [color classifier](https://github.com/algolia/color-extractor) from g
 This is the approach that went into final release code and is described in further detail in the Jupyter notebooks:
 
 *  Traffic Light GAN for Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised.ipynb)
+*  Refined Traffic Light GAN for New Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb)
 *  Traffic Light GAN for Carla via ROSBAG: [GAN-Semi-Supervised-site/gan_semi_supervised.ipynb](./GAN-Semi-Supervised-site/gan_semi_supervised.ipynb)
 
 ## 2.5 [Haar Classifier](http://coding-robin.de/2013/07/22/train-your-own-opencv-haar-classifier.html)

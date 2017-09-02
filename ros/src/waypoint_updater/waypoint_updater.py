@@ -159,7 +159,7 @@ class WaypointUpdater(object):
         if self.current_linear_velocity < 0.01 and self.state != GOFROMSTOP:
             self.state = STOP
 
-        braking_distance = self.restricted_speed*(self.current_linear_velocity/self.restricted_speed) + 8.
+        braking_distance = 1.25*self.restricted_speed*(self.current_linear_velocity/self.restricted_speed) + 10.
         tl_dist = self.distanceToREDTrafficLight()
 
         # still initializing - don't move yet.
@@ -199,10 +199,10 @@ class WaypointUpdater(object):
                 self.final_waypoints[i].twist.twist.angular.z = cte
 
         # we are stopped and more than a variable braking distance from a red light
-        elif tl_dist is not None and tl_dist > 6 and tl_dist < 20 and self.state == GOFROMSTOP:
+        elif tl_dist is not None and tl_dist > 8 and tl_dist < 20 and self.state == GOFROMSTOP:
             # calculate start and stop trajectory
             wpx = [0, self.redtlwp//5, self.redtlwp//3, self.redtlwp, len(vptsx)]
-            wpy = [5*mps, 5*mps, .0, -0.01, -0.01]
+            wpy = [5*mps, 5*mps, .0, .0, .0]
             poly2 = np.polyfit(np.array(wpx), np.array(wpy), 2)
             polynomial2 = np.poly1d(poly2)
 
@@ -231,12 +231,12 @@ class WaypointUpdater(object):
             velocity = polynomial2([0])[0]
 
 
-        elif tl_dist is not None and tl_dist > braking_distance and self.go_timer == 0:
+        elif tl_dist is not None and tl_dist > braking_distance and self.go_timer == 0 and self.restricted_speed*mps > tl_dist/2:
             self.state = STOPPING1
             # calculate start and stop trajectory
 
-            braking = -2*(self.current_linear_velocity/self.restricted_speed*mps)*self.restricted_speed*(tl_dist - braking_distance)/tl_dist
-            # braking += -self.current_linear_velocity*self.restricted_speed*(braking_distance/tl_dist)
+            braking = -2*(self.current_linear_velocity/self.restricted_speed*mps)*self.restricted_speed*((tl_dist-braking_distance)/tl_dist)
+            braking += -self.current_linear_velocity*self.restricted_speed*(braking_distance/tl_dist)
 
             wpx = [0, self.redtlwp, len(vptsx)]
             wpy = [braking, 2*braking, 3*braking]
@@ -266,7 +266,7 @@ class WaypointUpdater(object):
 
             velocity = polynomial2([0])[0]
 
-        elif tl_dist is not None and self.state != STOP and self.go_timer == 0:
+        elif tl_dist is not None and self.state != STOP and tl_dist < braking_distance and self.go_timer == 0:
             self.state = STOPPING2
             braking = -2*self.current_linear_velocity*self.restricted_speed
             wpx = [0, self.redtlwp, len(vptsx)]
@@ -310,7 +310,7 @@ class WaypointUpdater(object):
                 p.pose.pose.orientation.y = self.final_waypoints[i].pose.pose.orientation.y
                 p.pose.pose.orientation.z = self.final_waypoints[i].pose.pose.orientation.z
                 p.pose.pose.orientation.w = self.final_waypoints[i].pose.pose.orientation.w
-                p.twist.twist.linear.x = 0.
+                p.twist.twist.linear.x = -0.001
                 p.twist.twist.linear.y = 0.
                 p.twist.twist.linear.z = 0.
                 p.twist.twist.angular.x = 0.
@@ -320,7 +320,7 @@ class WaypointUpdater(object):
 
             velocity = 0
 
-        print "state:", self.state, "current_linear_velocity:", self.current_linear_velocity, "velocity:", velocity, "redtlwp", self.redtlwp, "tl_dist:", tl_dist, "braking_distance: ", braking_distance, "go_timer:", self.go_timer
+        print "state:", self.state, "current_linear_velocity:", self.current_linear_velocity, "velocity:", velocity, "redtlwp", self.redtlwp, "tl_dist:", tl_dist, "braking_distance: ", braking_distance, "go_timer:", self.go_timer, "restricted_speed:", self.restricted_speed, "restricted_speed*mps", self.restricted_speed*mps
 
     def waypoints_cb(self, msg):
         # DONE: Implement
@@ -350,12 +350,11 @@ class WaypointUpdater(object):
                 p.twist.twist.angular.z = waypoint.twist.twist.angular.z
                 self.waypoints.append(p)
 
-            # calculate number of waypoints for stopping using current restricted speed limit.
             wlen = len(self.waypoints)
             # stop within eighty waypoints
-            wstop = 80
+            wstop = 60
             for i in range(wstop):
-                self.waypoints[wlen-20-i].twist.twist.linear.x = -1.0
+                self.waypoints[wlen-20-i].twist.twist.linear.x = -20.0
             for i in range(20):
                 self.waypoints[wlen-1-i].twist.twist.linear.x = -0.01
 
