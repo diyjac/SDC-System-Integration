@@ -135,7 +135,7 @@ class TLDetector(object):
             self.state = state
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
-            if state == TrafficLight.GREEN:
+            if state == TrafficLight.GREEN and light_wp is not None:
                 light_wp = -light_wp
             elif state == TrafficLight.UNKNOWN:
                 light_wp = -1

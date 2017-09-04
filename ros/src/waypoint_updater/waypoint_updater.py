@@ -335,7 +335,7 @@ class WaypointUpdater(object):
             wpy1.append(-0.1)
 
             wpx1.append(0.)
-            wpy1.append(-0.1)
+            wpy1.append(-0.2)
 
             # 5 meters away
             wpx1.append(5)
