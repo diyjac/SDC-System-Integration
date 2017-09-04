@@ -51,7 +51,7 @@ class WaypointLoader(object):
                 p.pose.pose.position.z = float(wp['z'])
                 q = self.quaternion_from_yaw(float(wp['yaw']))
                 p.pose.pose.orientation = Quaternion(*q)
-                p.twist.twist.linear.x = float(self.velocity*0.27778)
+                p.twist.twist.linear.x = float(self.velocity*0.44704)
 
                 waypoints.append(p)
         return self.decelerate(waypoints)
