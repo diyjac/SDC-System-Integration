@@ -15,7 +15,7 @@ from traffic_light_config import config
 
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
-STATE_COUNT_THRESHOLD = 10
+STATE_COUNT_THRESHOLD = 3
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. (reduce our waypoint search).
 
 class TLDetector(object):
@@ -30,7 +30,7 @@ class TLDetector(object):
         self.wlen = 0
         self.camera_image = None
         self.lights = []
-        self.updateRate = 10 # 10Hz
+        self.updateRate = 3 # 10Hz
         self.nwp = None
         self.traffic_light_to_waypoint_map = []
 
@@ -46,7 +46,7 @@ class TLDetector(object):
         '''
         self.sub_raw_image = None
 
-        self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
+        self.upcoming_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier(rospy.get_param('~model_path'))
@@ -76,7 +76,7 @@ class TLDetector(object):
                         self.sub_raw_image.unregister()
                         self.sub_raw_image = None
                         self.last_wp = -1
-                        self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+                        self.upcoming_light_pub.publish(Int32(self.last_wp))
             rate.sleep()
 
     def pose_cb(self, msg):
@@ -135,12 +135,14 @@ class TLDetector(object):
             self.state = state
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
-            # light_wp = light_wp if state == TrafficLight.RED else -1
-            light_wp = light_wp if state == TrafficLight.RED or state == TrafficLight.YELLOW else -1
+            if state == TrafficLight.GREEN:
+                light_wp = -light_wp
+            elif state == TrafficLight.UNKNOWN:
+                light_wp = -1
             self.last_wp = light_wp
-            self.upcoming_red_light_pub.publish(Int32(light_wp))
+            self.upcoming_light_pub.publish(Int32(light_wp))
         else:
-            self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+            self.upcoming_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
         if self.init:
             self.init = False
@@ -199,8 +201,8 @@ class TLDetector(object):
 
                 # is it within the given number?
                 if tlwp < number-2:
-                    # is it within our traffic light tracking distance of 60 meters?
-                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 90.:
+                    # is it within our traffic light tracking distance of 100 meters?
+                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 100.:
                         # set the traffic light waypoint target
                         # light = (self.nwp+tlwp)%self.wlen
                         # use relative waypoint ahead of current one instead!
