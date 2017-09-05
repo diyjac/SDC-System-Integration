@@ -8,13 +8,22 @@ NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [R
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
 
-The following are the member of Team Vulture.
+The following are the members of Team Vulture.
 
-* __Team Lead__: John Chen, diyjac@gmail.com
-* Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, sebastian.trick@gmail.com
-* Yuesong Xie, cedric_xie@hotmail.com
-* Kungfeng Chen, kunfengchen@live.com
+<!---* __Team Lead__: John Chen, diyjac@gmail.com--->
+<!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
+<!---* Sebastian Trick, sebastian.trick@gmail.com--->
+<!---* Yuesong Xie, cedric_xie@hotmail.com--->
+<!---* Kungfeng Chen, kunfengchen@live.com--->
+
+|              | Name      |  E-Mail         | Image |
+|--------------|-----------|-----------------|--------------------------------
+| __Team Lead__| John Chen | diyjac@gmail.com| ![./imgs/team/JohnChen.jpg](./imgs/team/JohnChen.jpg) |
+|| Rainer Bareiß| rainer_bareiss@gmx.de | ![./imgs/team/RainerBareiss.jpg](./imgs/team/RainerBareiss.jpg) |
+|| Sebastian Trick| sebastian.trick@gmail.com |![./imgs/team/SebastianTrick.jpg](./imgs/team/SebastianTrick.jpg)  |
+|| Yuesong Xie | cedric_xie@hotmail.com |![./imgs/team/YuesongXie.jpg](./imgs/team/YuesongXie.jpg)  |
+|| Kungfeng Chen | kunfengchen@live.com | ![./imgs/team/KunfengChen.jpg](./imgs/team/KunfengChen.jpg)|
+
 
 __GO VULTURE!__
 
