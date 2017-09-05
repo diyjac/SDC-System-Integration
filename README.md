@@ -18,11 +18,11 @@ The following are the members of Team Vulture.
 
 |              | Name      |  E-Mail         | Image |
 |--------------|-----------|-----------------|--------------------------------
-| __Team Lead__| John Chen | diyjac@gmail.com| ![./imgs/team/JohnChen.jpg](./imgs/team/JohnChen.jpg =250x) |
-|| Rainer Bareiß| rainer_bareiss@gmx.de | ![./imgs/team/RainerBareiss.jpg](./imgs/team/RainerBareiss.jpg =250x) |
-|| Sebastian Trick| sebastian.trick@gmail.com |![./imgs/team/SebastianTrick.jpg](./imgs/team/SebastianTrick.jpg =250x)  |
-|| Yuesong Xie | cedric_xie@hotmail.com |![./imgs/team/YuesongXie.jpg](./imgs/team/YuesongXie.jpg =250x)  |
-|| Kungfeng Chen | kunfengchen@live.com | ![./imgs/team/KunfengChen.jpg](./imgs/team/KunfengChen.jpg =250x)
+| __Team Lead__| John Chen | diyjac@gmail.com| <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß| rainer_bareiss@gmx.de | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick| sebastian.trick@gmail.com | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kungfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
 
 
 
