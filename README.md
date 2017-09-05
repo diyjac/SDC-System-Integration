@@ -8,13 +8,24 @@ NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [R
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
 
-The following are the member of Team Vulture.
+The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
 
-* __Team Lead__: John Chen, diyjac@gmail.com
-* Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, sebastian.trick@gmail.com
-* Yuesong Xie, cedric_xie@hotmail.com
-* Kungfeng Chen, kunfengchen@live.com
+<!---* __Team Lead__: John Chen, diyjac@gmail.com--->
+<!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
+<!---* Sebastian Trick, sebastian.trick@gmail.com--->
+<!---* Yuesong Xie, cedric_xie@hotmail.com--->
+<!---* Kungfeng Chen, kunfengchen@live.com--->
+
+|              | Name      |  E-Mail         | Image |
+|--------------|-----------|-----------------|--------------------------------
+| __Team Lead__| John Chen | diyjac@gmail.com| <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß| rainer_bareiss@gmx.de | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick| sebastian.trick@gmail.com | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kungfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
+
+
+
 
 __GO VULTURE!__
 
