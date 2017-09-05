@@ -8,7 +8,7 @@ NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [R
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
 
-The following are the members of Team Vulture.
+The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
 
 <!---* __Team Lead__: John Chen, diyjac@gmail.com--->
 <!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
