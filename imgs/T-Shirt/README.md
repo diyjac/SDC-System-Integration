@@ -1,6 +1,6 @@
 # T-Shirt
 
-![](./imgs/T-Shirt/T-Shirt-sample-print.jpg)
+![](./T-Shirt-sample-print.jpg)
 
 This directory contains the template for our T-Shirt print. The file to be used for printing the T-Shirt is 
 
