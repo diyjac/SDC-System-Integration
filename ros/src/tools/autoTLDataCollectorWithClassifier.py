@@ -20,7 +20,7 @@ import tensorflow as tf
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
 class autoTLDataCollector():
-    def __init__(self, session):
+    def __init__(self, session, camera_topic):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('auto_traffic_light_data_collector')
 
@@ -36,6 +36,7 @@ class autoTLDataCollector():
         # - 0.5 - 1 frame every two seconds
         self.updateRate = 10
 
+        self.camera_topic = camera_topic
         self.bridge = CvBridge()
         self.camera_sub = None
 
@@ -197,7 +198,7 @@ class autoTLDataCollector():
                 tl_dist = self.dist_to_next_traffic_light()
                 if self.camera_sub is None:
                     if tl_dist is not None and tl_dist < 80.:
-                        self.camera_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.camera_sub = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
                     elif self.ctl is not None:
                         if self.img_rows is not None:
                             color = (192, 192, 192)
@@ -319,11 +320,13 @@ class autoTLDataCollector():
 if __name__ == "__main__":
     defaultOutput = 'autoout%04d.jpg'
     parser = argparse.ArgumentParser(description='Udacity SDC: System Integration - Auto Data Collector with Classifier')
+    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
     parser.add_argument('outfilename', type=str, default=defaultOutput, help='jpeg output file pattern')
     args = parser.parse_args()
     jpgout = args.outfilename
+    camera_topic = args.cameratopic
 
     try:
-        autoTLDataCollector(jpgout)
+        autoTLDataCollector(jpgout, camera_topic)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start auto traffric light data collector.')

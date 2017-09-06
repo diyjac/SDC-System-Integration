@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import rospy
 from std_msgs.msg import Int32
 from geometry_msgs.msg import PoseStamped, Pose
@@ -18,10 +19,11 @@ import tensorflow as tf
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
 class GrabFrontCameraImage():
-    def __init__(self):
+    def __init__(self, camera_topic):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('front_camera_viewer')
 
+        self.camera_topic = camera_topic
         self.cv_image = None
         self.lights = []
 
@@ -113,7 +115,7 @@ class GrabFrontCameraImage():
                 tl_dist = self.dist_to_next_traffic_light()
                 if self.camera_sub is None:
                     if tl_dist < 80.:
-                        self.camera_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.camera_sub = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
                     else:
                         if self.img_rows is not None:
                             color = (192, 192, 192)
@@ -203,8 +205,12 @@ class GrabFrontCameraImage():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Udacity SDC System Integration, Front Camera Image Grabber')
+    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
+    args = parser.parse_args()
+
     try:
-        GrabFrontCameraImage()
+        GrabFrontCameraImage(args.cameratopic)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')
 

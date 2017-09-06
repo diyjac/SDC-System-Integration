@@ -20,7 +20,7 @@ from traffic_light_config import config
 MPS = 0.44704
 
 class GenerateDiagnostics():
-    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size):
+    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, camera_topic):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('diag_gps')
 
@@ -48,6 +48,7 @@ class GenerateDiagnostics():
         self.throttle_pub = rospy.Subscriber('/vehicle/throttle_cmd', ThrottleCmd, self.throttle_cb)
         self.brake_pub = rospy.Subscriber('/vehicle/brake_cmd', BrakeCmd, self.brake_cb)
         self.sub_traffic_lights = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
+        self.camera_topic = camera_topic
         self.sub_raw_camera = None
         self.bridge = CvBridge()
 
@@ -368,7 +369,7 @@ class GenerateDiagnostics():
                 tl_dist = self.dist_to_next_traffic_light()
                 if self.sub_raw_camera is None and tl_dist is not None:
                     if tl_dist < 80.:
-                        self.sub_raw_camera = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.sub_raw_camera = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
 
                 if (self.sub_waypoints is None and self.steering_cmd is not None and
                         self.throttle_cmd is not None and self.brake_cmd is not None):
@@ -452,9 +453,10 @@ if __name__ == "__main__":
     parser.add_argument('--maxhistory', type=int, default="200", help='Maximum History: default=200')
     parser.add_argument('--textspacing', type=int, default="100", help='Text Spacing: default=100')
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
+    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
     args = parser.parse_args()
 
     try:
-        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize))
+        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')

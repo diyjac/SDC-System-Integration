@@ -14,16 +14,17 @@ import numpy as np
 from traffic_light_config import config
 
 class GrabFrontCameraImage():
-    def __init__(self, outfile):
+    def __init__(self, outfile, camera_topic):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('front_camera_image_grabber')
         self.outfile = outfile
 
         self.cv_image = None
         self.lights = []
+        self.camera_topic = camera_topic
 
         sub2 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
-        sub3 = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+        sub3 = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
 
         self.bridge = CvBridge()
         self.listener = tf.TransformListener()
@@ -118,11 +119,12 @@ class GrabFrontCameraImage():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Udacity SDC System Integration, Front Camera Image Grabber')
+    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
     parser.add_argument('outfile', type=str, help='Image save file')
     args = parser.parse_args()
 
     try:
-        GrabFrontCameraImage(args.outfile)
+        GrabFrontCameraImage(args.outfile, args.cameratopic)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not grab front camera image.')
 
