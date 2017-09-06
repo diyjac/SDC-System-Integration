@@ -33,6 +33,8 @@ class TLDetector(object):
         self.updateRate = 3 # 10Hz
         self.nwp = None
         self.traffic_light_to_waypoint_map = []
+        self.attribute = "NONE"
+        self.has_image = False
 
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -102,7 +104,7 @@ class TLDetector(object):
         self.theta = euler[2]
         if self.light_classifier is not None:
             if self.light_classifier.predict is None:
-                print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR...."
+                print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR....", self.attribute, self.camera_topic, self.has_image
         else:
             print "WARNING!   NO TRAFFIC LIGHT DETECTOR...."
 
@@ -237,7 +239,14 @@ class TLDetector(object):
             self.prev_light_loc = None
             return TrafficLight.RED
 
-        self.camera_image.encoding = "rgb8"
+        # fixing convoluted camera encoding...
+        if hasattr(self.camera_image, 'encoding'):
+            self.attribute = self.camera_image.encoding
+            if self.camera_image.encoding == '8UC3':
+                self.camera_image.encoding = "rgb8"
+        else:
+            self.camera_image.encoding = 'rgb8'
+
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
         if self.row != 600 or self.col != 800:
             image = cv2.resize(cv_image, (800, 600), interpolation=cv2.INTER_AREA)

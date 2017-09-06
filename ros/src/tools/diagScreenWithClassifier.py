@@ -462,7 +462,7 @@ if __name__ == "__main__":
     parser.add_argument('--maxhistory', type=int, default="200", help='Maximum History: default=200')
     parser.add_argument('--textspacing', type=int, default="100", help='Text Spacing: default=100')
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
-    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
+    parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     args = parser.parse_args()
 
     try:

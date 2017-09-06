@@ -119,7 +119,7 @@ class GrabFrontCameraImage():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Udacity SDC System Integration, Front Camera Image Grabber')
-    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
+    parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     parser.add_argument('outfile', type=str, help='Image save file')
     args = parser.parse_args()
 

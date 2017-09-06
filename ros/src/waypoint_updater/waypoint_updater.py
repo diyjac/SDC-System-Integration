@@ -282,6 +282,7 @@ class WaypointUpdater(object):
     def waypoints_cb(self, msg):
         # DONE: Implement
         # make our own copy of the waypoints - they are static and do not change
+        global LOOKAHEAD_WPS
         if self.waypoints is None:
             # unsubscribe to the waypoint messages - cut down on resource usage
             self.sub_waypoints.unregister()
@@ -320,6 +321,9 @@ class WaypointUpdater(object):
                 p.twist.twist.angular.y = waypoint.twist.twist.angular.y
                 p.twist.twist.angular.z = waypoint.twist.twist.angular.z
                 self.waypoints.append(p)
+
+            if LOOKAHEAD_WPS > len(msg.waypoints):
+                LOOKAHEAD_WPS = len(msg.waypoints)
 
             # use the restricted speed limit in mps to create our deceleration points (in reverse)
             wpx0 = [-LOOKAHEAD_WPS, 0., LOOKAHEAD_WPS]
@@ -419,10 +423,11 @@ class WaypointUpdater(object):
         waypoints[waypoint].twist.twist.linear.x = velocity
 
     def distance(self, waypoints, wp1, wp2):
+        wlen = len(waypoints)
         dist = 0
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
         for i in range(wp1, wp2+1):
-            dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
+            dist += dl(waypoints[wp1%wlen].pose.pose.position, waypoints[i%wlen].pose.pose.position)
             wp1 = i
         return dist
 

@@ -262,7 +262,7 @@ class autoTLDataCollector():
 if __name__ == "__main__":
     defaultOutput = 'autoout%04d.jpg'
     parser = argparse.ArgumentParser(description='Udacity SDC: System Integration - Auto Data Collector')
-    parser.add_argument('--cameratopic', type=str, default='/camera/image_raw', help='camera ros topic')
+    parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     parser.add_argument('outfilename', type=str, default=defaultOutput, help='jpeg output file pattern')
     args = parser.parse_args()
     jpgout = args.outfilename
