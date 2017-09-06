@@ -14,11 +14,13 @@ class DumpWaypoints():
     def __init__(self, outfile):
         # initialize and subscribe to the current position and waypoint base topic
         rospy.init_node('waypoint_grabber')
-        sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        self.sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+        self.sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         self.pose = None
         self.waypoints = None
         self.outfile = outfile
+        self.s = 0.
+        self.ss = 0.
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -28,6 +30,15 @@ class DumpWaypoints():
            msg (PoseStamped): car pose with (x,y,z) and rotation (x,y,z,q)
         """
         self.pose = msg
+        self.sub1.unregister()
+        self.sub1 = None
+
+    def distance(self, waypoints, wp):
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        wp0 = wp-1
+        if wp0 < 0:
+            wp0 = 0
+        return dl(waypoints[wp0].pose.pose.position, waypoints[wp].pose.pose.position)
 
     def waypoints_cb(self, msg):
         """Grab the first incoming camera image and saves it
@@ -36,11 +47,14 @@ class DumpWaypoints():
             msg (Image): image from car-mounted camera
 
         """
-        self.waypoints = msg
-        if self.pose:
+        if self.pose is not None and self.waypoints is None:
+            self.sub2.unregister()
+            self.sub2 = None
+            self.waypoints = msg.waypoints
+            print "waypoints size: ", len(self.waypoints)
             print "pose: "
             print self.pose
-            fieldname = ['x', 'y', 'z', 'ax', 'ay', 'az', 'aw']
+            fieldname = ['x', 'y', 'z', 'ax', 'ay', 'az', 'aw', 's', 'ss']
             log_file = open(self.outfile, 'w')
             log_writer = csv.DictWriter(log_file, fieldnames=fieldname)
             log_writer.writeheader()
@@ -51,9 +65,14 @@ class DumpWaypoints():
                 'ax': self.pose.pose.orientation.x,
                 'ay': self.pose.pose.orientation.y,
 		'az': self.pose.pose.orientation.z,
-                'aw': self.pose.pose.orientation.w
+                'aw': self.pose.pose.orientation.w,
+                's': self.s,
+                'ss': self.ss
                 })
-            for waypoint in msg.waypoints:
+            for i in range(len(self.waypoints)):
+                waypoint = self.waypoints[i]
+                self.ss = self.distance(self.waypoints, i)
+                self.s += self.ss
                 log_writer.writerow({
                 'x': waypoint.pose.pose.position.x,
                 'y': waypoint.pose.pose.position.y,
@@ -61,7 +80,9 @@ class DumpWaypoints():
                 'ax': waypoint.pose.pose.orientation.x,
                 'ay': waypoint.pose.pose.orientation.y,
 		'az': waypoint.pose.pose.orientation.z,
-                'aw': waypoint.pose.pose.orientation.w
+                'aw': waypoint.pose.pose.orientation.w,
+                's': self.s,
+                'ss': self.ss
                 })
 
             log_file.close()

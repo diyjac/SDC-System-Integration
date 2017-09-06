@@ -6,6 +6,10 @@
 2. Rosbag image samples are real world samples for classifier training/testing
 3. Carla should not go any further than the last waypoint given (no looping).
 4. Safety driver will be present when testing with Carla in the field.
+5. For safety reasons, throttle and brake commands are limited to 80% actuation.  This may limit the vehicle's ability to reach its intended velocity.
+6. The Green Light in the simulator is still too quick (around 2 seconds).  In order to ensure that the vehicle does not cross the intersection on a red light, the system will test if at its current velocity, it can reach the traffic light in 2 seconds.  If not, it will prefer to slow down for a second chance later when it reaches within 5 meters of the traffic light and stops.
+7. Tested with Simulator with 40kmph, 40mph and 10mph speed settings.  _NOTE: Because of the throttle and braking command limits set to 80%, some speed settings could not be reached during testing._
+8. Note: When manually moving the vehicle to a position in the track, make sure to start the system up with the `Manual` checkbox still checked.  Once the system is completely initialized with its classifier loaded and working, you may uncheck the `Manual` checkbox to engage the system.
 
 ## Custom Diagnostic Tools
 
@@ -31,13 +35,15 @@ This tool force sends -1 waypoint message to force the vehicle to move during te
 This tool will automatically collect pictures of the front vehicle camera and labels them for classification while it is driving in the simulator. 
 11. __diagScreen.py__
 This tool is a combination of most of the tools above including charts of the vehicle's speed, throttle, brake and steering.
-12. __view_rosbag_video.py__
-This tool allows you to view the front vehicle camera images recorded from Carla at the test track in the form of a rosbag in a pygame window.
-13. __rosbag_video_2_jpg.py__
+12. __diagScreenWithClassifier.py__
+This tool is a combination of most of the tools above including charts of the vehicle's speed, throttle, brake, steering and the traffic light classifier to predict the traffic lights.
+13. __view_rosbag_video.py__
+This tool allows you to view the front vehicle camera images recorded from Carla at the test track in the form of a rosbag in a pygame window, and has an integrated GAN classifier to show its traffic light predictions.
+14. __rosbag_video_2_jpg.py__
 This tool allows you to dump the rosbag camera images into a set of JPEG files.  We use this for training the classifier for the SITE test.
-14. __rosbag_video_2_mp4.py__
+15. __rosbag_video_2_mp4.py__
 This tool allows you to convert the rosbag camera images into a MP4 video file using the moviepy python module.
-15. __rosbag_video_2_gif.py__
+16. __rosbag_video_2_gif.py__
 This tool allows you to convert the rosbag camera images into a moving GIF file using the moviepy python module.
 
 ## Development and Testing

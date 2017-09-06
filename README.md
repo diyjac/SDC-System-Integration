@@ -1,18 +1,31 @@
 ## Udacity Self Driving Car Nanodegree Final Project: System Integration
 
-This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.  You may find our development and testing logs in the [REPORT.md](./REPORT.md) file.
+This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
+
+NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
 
 ### The Team
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
 
-The following are the member of Team Vulture.
+The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
 
-* __Team Lead__: John Chen, diyjac@gmail.com
-* Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, sebastian.trick@gmail.com
-* Yuesong Xie, cedric_xie@hotmail.com
-* Kungfeng Chen, kunfengchen@live.com
+<!---* __Team Lead__: John Chen, diyjac@gmail.com--->
+<!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
+<!---* Sebastian Trick, sebastian.trick@gmail.com--->
+<!---* Yuesong Xie, cedric_xie@hotmail.com--->
+<!---* Kungfeng Chen, kunfengchen@live.com--->
+
+|              | Name      |  E-Mail         | Image |
+|--------------|-----------|-----------------|--------------------------------
+| __Team Lead__| John Chen | diyjac@gmail.com| <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß| rainer_bareiss@gmx.de | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick| sebastian.trick@gmail.com | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kungfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
+
+
+
 
 __GO VULTURE!__
 
@@ -34,7 +47,7 @@ __GO VULTURE!__
   * [Dataspeed DBW](https://bitbucket.org/DataspeedInc/dbw_mkz_ros)
   * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
 
-* Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases/tag/v1.1).
+* Download the [Udacity Simulator v1.2](https://github.com/udacity/CarND-Capstone/releases/tag/v1.2).
 
     __NOTE__: *If you are installing in native Ubuntu 16.04, the Dataspeed DBW One Line SDK binary install will auto install 4.4.0-92-generic Linux kernel, which will break CUDA and the NVIDIA 375 drivers if you have NVIDIA GPU in your native Ubuntu 16.04 build.  This will cause starting the simulator to fail because it can no longer open the OpenGL drivers provided by NVIDIA:*
 
@@ -172,3 +185,14 @@ cd ros
 rosrun tools autoTLDataCollector.py mysamples/session1
 ```
 ![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)
+
+The ROS Graph was updated as follows  
+
+![./imgs/updated_ROS_graph.png](./imgs/updated_ROS_graph.png)
+
+as we were informed by Udacity 
+
+![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
+
+that the obstacle node is currently not implemented in the simulator. 
+

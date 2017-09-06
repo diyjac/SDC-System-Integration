@@ -276,7 +276,7 @@ Applying a [color classifier](https://github.com/algolia/color-extractor) from g
 
 ![GAN Simulator Accuracy](../imgs/GAN-sim-accuracy.png)
 
-This is the approach that went into final release code and is described in further detail in the Jupyter notebooks:
+This is the approach that went into final release code and is described in further detail in the Jupyter notebooks.  This GAN model is based on the Tensorflow model as described in Udacity AIND term 2, Semisupervised Learning section:
 
 *  Traffic Light GAN for Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised.ipynb)
 *  Refined Traffic Light GAN for New Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb)
