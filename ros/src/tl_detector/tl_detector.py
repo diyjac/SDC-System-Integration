@@ -49,7 +49,11 @@ class TLDetector(object):
         self.upcoming_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier(rospy.get_param('~model_path'))
+        self.path = rospy.get_param('~model_path')
+        if self.path != "NONE":
+            self.light_classifier = TLClassifier(self.path)
+        else:
+            self.light_classifier = None
 
         self.init = True
         self.state = TrafficLight.UNKNOWN
@@ -77,6 +81,8 @@ class TLDetector(object):
                         self.sub_raw_image = None
                         self.last_wp = -1
                         self.upcoming_light_pub.publish(Int32(self.last_wp))
+            elif self.light_classifier is None:
+                self.upcoming_light_pub.publish(Int32(-1))
             rate.sleep()
 
     def pose_cb(self, msg):
@@ -89,8 +95,11 @@ class TLDetector(object):
             self.orientation.z,
             self.orientation.w])
         self.theta = euler[2]
-        if self.light_classifier.predict is None:
-            print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR...."
+        if self.light_classifier is not None:
+            if self.light_classifier.predict is None:
+                print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR...."
+        else:
+            print "WARNING!   NO TRAFFIC LIGHT DETECTOR...."
 
     def waypoints_cb(self, msg):
         # make our own copy of the waypoints - they are static and do not change
@@ -231,7 +240,10 @@ class TLDetector(object):
             image = np.copy(cv_image)
 
         #Get classification
-        classification = self.light_classifier.get_classification(image)
+        if self.light_classifier is not None:
+            classification = self.light_classifier.get_classification(image)
+        else:
+            classification = TrafficLight.UNKNOWN
         print "traffic light: ", label[classification]
         return classification
 
