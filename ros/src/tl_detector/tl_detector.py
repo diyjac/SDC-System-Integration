@@ -30,7 +30,7 @@ class TLDetector(object):
         self.wlen = 0
         self.camera_image = None
         self.lights = []
-        self.updateRate = 3 # 10Hz
+        self.updateRate = 10 # 3Hz
         self.nwp = None
         self.traffic_light_to_waypoint_map = []
         self.attribute = "NONE"
