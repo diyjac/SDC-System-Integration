@@ -11,7 +11,7 @@ import math
 import numpy as np
 import tf
 import cv2
-from traffic_light_config import config
+import yaml
 
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
@@ -33,6 +33,8 @@ class TLDetector(object):
         self.updateRate = 3 # 10Hz
         self.nwp = None
         self.traffic_light_to_waypoint_map = []
+        self.attribute = "NONE"
+        self.has_image = False
 
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -46,10 +48,15 @@ class TLDetector(object):
         '''
         self.sub_raw_image = None
 
+        config_string = rospy.get_param("/traffic_light_config")
+        self.config = yaml.load(config_string)
+
         self.upcoming_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
         self.path = rospy.get_param('~model_path')
+        self.camera_topic =  rospy.get_param('~camera_topic')
+
         if self.path != "NONE":
             self.light_classifier = TLClassifier(self.path)
         else:
@@ -61,7 +68,7 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
         self.ntlwp = None
-        self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+        self.sub_raw_image = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
 
         # don't spin - control our resource usage!
         self.loop()
@@ -75,7 +82,7 @@ class TLDetector(object):
                     self.nwp = self.nextWaypoint(self.pose)
                     self.ntlwp = self.getNextLightWaypoint(LOOKAHEAD_WPS)
                     if self.ntlwp is not None and self.sub_raw_image is None:
-                        self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.sub_raw_image = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
                     elif self.ntlwp is None and self.sub_raw_image is not None:
                         self.sub_raw_image.unregister()
                         self.sub_raw_image = None
@@ -97,7 +104,7 @@ class TLDetector(object):
         self.theta = euler[2]
         if self.light_classifier is not None:
             if self.light_classifier.predict is None:
-                print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR...."
+                print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR....", self.attribute, self.camera_topic, self.has_image
         else:
             print "WARNING!   NO TRAFFIC LIGHT DETECTOR...."
 
@@ -159,11 +166,11 @@ class TLDetector(object):
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        for lidx in range(len(config.light_positions)):
+        for lidx in range(len(self.config['light_positions'])):
             dist = 100000.
             tlwp = 0
             for widx in range(len(self.waypoints)):
-                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                d1 = dl(self.waypoints[widx].pose.pose.position, self.config['light_positions'][lidx])
                 if dist > d1:
                     tlwp = widx
                     dist = d1
@@ -232,7 +239,14 @@ class TLDetector(object):
             self.prev_light_loc = None
             return TrafficLight.RED
 
-        self.camera_image.encoding = "rgb8"
+        # fixing convoluted camera encoding...
+        if hasattr(self.camera_image, 'encoding'):
+            self.attribute = self.camera_image.encoding
+            if self.camera_image.encoding == '8UC3':
+                self.camera_image.encoding = "rgb8"
+        else:
+            self.camera_image.encoding = 'rgb8'
+
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
         if self.row != 600 or self.col != 800:
             image = cv2.resize(cv_image, (800, 600), interpolation=cv2.INTER_AREA)

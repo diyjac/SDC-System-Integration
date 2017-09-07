@@ -15,19 +15,22 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from traffic_light_config import config
+import yaml
+import os
 import tensorflow as tf
+
 
 MPS = 0.44704
 
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
 class GenerateDiagnostics():
-    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size):
+    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('diag_tl_classifier')
 
         self.restricted_speed = 1
+        self.camera_topic = camera_topic
         self.cv_image = None
         self.camera_image = None
         self.lights = []
@@ -42,6 +45,11 @@ class GenerateDiagnostics():
         self.throttle_history = []
         self.brake_history = []
         self.max_history_size = max_history
+
+        # get traffic light positions
+        with open(os.getcwd()+'/src/tl_detector/'+config_file, 'r') as myconfig:
+            config_string=myconfig.read()
+            self.config = yaml.load(config_string)
 
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         self.sub_fwaypoints = rospy.Subscriber('/final_waypoints', Lane, self.fwaypoints_cb)
@@ -116,10 +124,10 @@ class GenerateDiagnostics():
         if self.tf_session is None:
             # get the traffic light classifier
             self.model_path = '../classifier/GAN-Semi-Supervised-sim'
-            self.config = tf.ConfigProto(log_device_placement=True)
-            self.config.gpu_options.per_process_gpu_memory_fraction = 0.2  # don't hog all the VRAM!
-            self.config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
-            self.tf_session = tf.Session(config=self.config)
+            self.tf_config = tf.ConfigProto(log_device_placement=True)
+            self.tf_config.gpu_options.per_process_gpu_memory_fraction = 0.2  # don't hog all the VRAM!
+            self.tf_config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
+            self.tf_session = tf.Session(config=self.tf_config)
             self.saver = tf.train.import_meta_graph(self.model_path + '/checkpoints/generator.ckpt.meta')
             self.saver.restore(self.tf_session, tf.train.latest_checkpoint(self.model_path + '/checkpoints/'))
 
@@ -132,7 +140,14 @@ class GenerateDiagnostics():
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
-            msg.encoding = "rgb8"
+
+            # fixing convoluted camera encoding...
+            if hasattr(msg, 'encoding'):
+                if msg.encoding == '8UC3':
+                    msg.encoding = "rgb8"
+            else:
+                msg.encoding = 'rgb8'
+
             self.camera_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
 
             if height != 600 or width != 800:
@@ -240,11 +255,11 @@ class GenerateDiagnostics():
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        for lidx in range(len(config.light_positions)):
+        for lidx in range(len(self.config['light_positions'])):
             dist = 100000.
             tlwp = 0
             for widx in range(len(self.waypoints)):
-                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                d1 = dl(self.waypoints[widx].pose.pose.position, self.config['light_positions'][lidx])
                 if dist > d1:
                     tlwp = widx
                     dist = d1
@@ -373,7 +388,7 @@ class GenerateDiagnostics():
                 tl_dist = self.dist_to_next_traffic_light()
                 if self.sub_raw_camera is None and tl_dist is not None:
                     if tl_dist < 80.:
-                        self.sub_raw_camera = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.sub_raw_camera = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
 
                 if (self.sub_waypoints is None and self.steering_cmd is not None and
                         self.throttle_cmd is not None and self.brake_cmd is not None):
@@ -461,9 +476,10 @@ if __name__ == "__main__":
     parser.add_argument('--maxhistory', type=int, default="200", help='Maximum History: default=200')
     parser.add_argument('--textspacing', type=int, default="100", help='Text Spacing: default=100')
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
+    parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     args = parser.parse_args()
 
     try:
-        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize))
+        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')
