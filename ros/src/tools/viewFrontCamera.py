@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import rospy
 from std_msgs.msg import Int32
 from geometry_msgs.msg import PoseStamped, Pose
@@ -12,15 +13,21 @@ import pygame
 import sys
 import numpy as np
 import math
-from traffic_light_config import config
+import yaml
+import os
 
-class GrabFrontCameraImage():
-    def __init__(self):
+class ViewFrontCameraImage():
+    def __init__(self, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('front_camera_viewer')
 
+        self.camera_topic = camera_topic
         self.cv_image = None
         self.lights = []
+
+        with open(os.getcwd()+'/src/tl_detector/'+config_file, 'r') as myconfig:
+            config_string=myconfig.read()
+            self.config = yaml.load(config_string)
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
@@ -65,20 +72,20 @@ class GrabFrontCameraImage():
         dist = 100000.
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
         ctl = 0
-        for i in range(len(config.light_positions)):
-            d1 = dl(self.position, config.light_positions[i])
+        for i in range(len(self.config['light_positions'])):
+            d1 = dl(self.position, self.config['light_positions'][i])
             if dist > d1:
                 ctl = i
                 dist = d1
-        x = config.light_positions[ctl][0]
-        y = config.light_positions[ctl][1]
+        x = self.config['light_positions'][ctl][0]
+        y = self.config['light_positions'][ctl][1]
         heading = np.arctan2((y-self.position.y), (x-self.position.x))
         angle = np.abs(self.theta-heading)
         if angle > np.pi/4.:
             ctl += 1
-            if ctl >= len(config.light_positions):
+            if ctl >= len(self.config['light_positions']):
                 ctl = 0
-            dist = dl(self.position, config.light_positions[ctl])
+            dist = dl(self.position, self.config['light_positions'][ctl])
         self.ctl = ctl
         return dist
 
@@ -91,7 +98,7 @@ class GrabFrontCameraImage():
                 tl_dist = self.dist_to_next_traffic_light()
                 if self.camera_sub is None:
                     if tl_dist < 80.:
-                        self.camera_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.camera_sub = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
                     else:
                         if self.img_rows is not None:
                             color = (192, 192, 192)
@@ -120,11 +127,11 @@ class GrabFrontCameraImage():
             y (int): y coordinate of target point in image
 
         """
-        fx = config.camera_info.focal_length_x
-        fy = config.camera_info.focal_length_y
+        fx = self.config.camera_info.focal_length_x
+        fy = self.config.camera_info.focal_length_y
 
-        image_width = config.camera_info.image_width
-        image_height = config.camera_info.image_height
+        image_width = self.config.camera_info.image_width
+        image_height = self.config.camera_info.image_height
 
         # get transform between pose of camera and world frame
         trans = None
@@ -179,7 +186,7 @@ class GrabFrontCameraImage():
         pygame.display.flip()
 
     def image_cb(self, msg):
-        """Grab the first incoming camera image and saves it
+        """View incoming camera images
 
         Args:
             msg (Image): image from car-mounted camera
@@ -192,7 +199,14 @@ class GrabFrontCameraImage():
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
-            msg.encoding = "rgb8"
+
+            # fixing convoluted camera encoding...
+            if hasattr(msg, 'encoding'):
+                if msg.encoding == '8UC3':
+                    msg.encoding = "rgb8"
+            else:
+                msg.encoding = 'rgb8'
+
             self.cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
 
             # TODO: experiment with drawing bounding boxes around traffic lights
@@ -210,8 +224,13 @@ class GrabFrontCameraImage():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Udacity SDC System Integration, Front Camera Image Viewer')
+    parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
+    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
+    args = parser.parse_args()
+
     try:
-        GrabFrontCameraImage()
+        ViewFrontCameraImage(args.cameratopic, args.trafficconfig)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')
 

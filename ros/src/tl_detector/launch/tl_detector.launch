@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="tl_detector" type="tl_detector.py" name="tl_detector" output="screen" cwd="node">
+        <param name="model_path" value="$(find styx)../../../classifier/GAN-Semi-Supervised-sim" />
+        <param name="camera_topic" value="/image_color" />
+    </node>
+</launch>
