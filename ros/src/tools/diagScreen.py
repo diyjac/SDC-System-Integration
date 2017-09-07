@@ -15,12 +15,13 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from traffic_light_config import config
+import yaml
+import os
 
 MPS = 0.44704
 
 class GenerateDiagnostics():
-    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, camera_topic):
+    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('diag_gps')
 
@@ -39,6 +40,11 @@ class GenerateDiagnostics():
         self.throttle_history = []
         self.brake_history = []
         self.max_history_size = max_history
+
+        # get waypoint configuration
+        with open(os.getcwd()+'/src/tl_detector/'+config_file, 'r') as myconfig:
+            config_string=myconfig.read()
+            self.config = yaml.load(config_string)
 
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         self.sub_fwaypoints = rospy.Subscriber('/final_waypoints', Lane, self.fwaypoints_cb)
@@ -103,11 +109,11 @@ class GenerateDiagnostics():
             y (int): y coordinate of target point in image
 
         """
-        fx = config.camera_info.focal_length_x
-        fy = config.camera_info.focal_length_y
+        fx = self.config.camera_info.focal_length_x
+        fy = self.config.camera_info.focal_length_y
 
-        image_width = config.camera_info.image_width
-        image_height = config.camera_info.image_height
+        image_width = self.config.camera_info.image_width
+        image_height = self.config.camera_info.image_height
 
         # get transform between pose of camera and world frame
         trans = None
@@ -161,7 +167,14 @@ class GenerateDiagnostics():
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
-            msg.encoding = "rgb8"
+
+            # fixing convoluted camera encoding...
+            if hasattr(msg, 'encoding'):
+                if msg.encoding == '8UC3':
+                    msg.encoding = "rgb8"
+            else:
+                msg.encoding = 'rgb8'
+
             self.camera_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
 
     def traffic_cb(self, msg):
@@ -236,11 +249,11 @@ class GenerateDiagnostics():
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        for lidx in range(len(config.light_positions)):
+        for lidx in range(len(self.config['light_positions'])):
             dist = 100000.
             tlwp = 0
             for widx in range(len(self.waypoints)):
-                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                d1 = dl(self.waypoints[widx].pose.pose.position, self.config['light_positions'][lidx])
                 if dist > d1:
                     tlwp = widx
                     dist = d1
@@ -454,9 +467,10 @@ if __name__ == "__main__":
     parser.add_argument('--textspacing', type=int, default="100", help='Text Spacing: default=100')
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
     parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
+    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
     args = parser.parse_args()
 
     try:
-        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic)
+        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic, args.trafficconfig)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')

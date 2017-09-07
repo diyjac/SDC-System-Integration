@@ -11,10 +11,11 @@ import tf
 import cv2
 import sys
 import numpy as np
-from traffic_light_config import config
+import yaml
+import os
 
 class GrabFrontCameraImage():
-    def __init__(self, outfile, camera_topic):
+    def __init__(self, outfile, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('front_camera_image_grabber')
         self.outfile = outfile
@@ -22,6 +23,10 @@ class GrabFrontCameraImage():
         self.cv_image = None
         self.lights = []
         self.camera_topic = camera_topic
+
+        with open(os.getcwd()+'/src/tl_detector/'+config_file, 'r') as myconfig:
+            config_string=myconfig.read()
+            self.config = yaml.load(config_string)
 
         sub2 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
         sub3 = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
@@ -105,7 +110,14 @@ class GrabFrontCameraImage():
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
-            msg.encoding = "rgb8"
+
+            # fixing convoluted camera encoding...
+            if hasattr(msg, 'encoding'):
+                if msg.encoding == '8UC3':
+                    msg.encoding = "rgb8"
+            else:
+                msg.encoding = 'rgb8'
+
             self.cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
             # TODO: experiment with drawing bounding boxes around traffic lights
@@ -121,10 +133,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Udacity SDC System Integration, Front Camera Image Grabber')
     parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     parser.add_argument('outfile', type=str, help='Image save file')
+    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
     args = parser.parse_args()
 
     try:
-        GrabFrontCameraImage(args.outfile, args.cameratopic)
+        GrabFrontCameraImage(args.outfile, args.cameratopic, args.trafficconfig)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not grab front camera image.')
 

@@ -14,13 +14,14 @@ import sys
 import numpy as np
 import math
 import csv
-from traffic_light_config import config
 import tensorflow as tf
+import yaml
+import os
 
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
 class autoTLDataCollector():
-    def __init__(self, session, camera_topic):
+    def __init__(self, session, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('auto_traffic_light_data_collector')
 
@@ -56,6 +57,11 @@ class autoTLDataCollector():
         self.theta = None
         self.ctl = None
         self.traffic_light_to_waypoint_map = []
+
+        # get traffic light positions
+        with open(os.getcwd()+'/src/tl_detector/'+config_file, 'r') as myconfig:
+            config_string=myconfig.read()
+            self.config = yaml.load(config_string)
 
         # initialize tensorflow
         self.tf_session = None
@@ -122,11 +128,11 @@ class autoTLDataCollector():
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        for lidx in range(len(config.light_positions)):
+        for lidx in range(len(self.config['light_positions'])):
             dist = 100000.
             tlwp = 0
             for widx in range(len(self.waypoints)):
-                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                d1 = dl(self.waypoints[widx].pose.pose.position, self.config['light_positions'][lidx])
                 if dist > d1:
                     tlwp = widx
                     dist = d1
@@ -246,10 +252,10 @@ class autoTLDataCollector():
         if self.tf_session is None:
             # get the traffic light classifier
             self.model_path = '../classifier/GAN-Semi-Supervised-sim'
-            self.config = tf.ConfigProto(log_device_placement=True)
-            self.config.gpu_options.per_process_gpu_memory_fraction = 0.2  # don't hog all the VRAM!
-            self.config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
-            self.tf_session = tf.Session(config=self.config)
+            self.tf_config = tf.ConfigProto(log_device_placement=True)
+            self.tf_config.gpu_options.per_process_gpu_memory_fraction = 0.2  # don't hog all the VRAM!
+            self.tf_config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
+            self.tf_session = tf.Session(config=self.tf_config)
             self.saver = tf.train.import_meta_graph(self.model_path + '/checkpoints/generator.ckpt.meta')
             self.saver.restore(self.tf_session, tf.train.latest_checkpoint(self.model_path + '/checkpoints/'))
 
@@ -262,7 +268,14 @@ class autoTLDataCollector():
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
-            msg.encoding = "rgb8"
+
+            # fixing convoluted camera encoding...
+            if hasattr(msg, 'encoding'):
+                if msg.encoding == '8UC3':
+                    msg.encoding = "rgb8"
+            else:
+                msg.encoding = 'rgb8'
+
             self.cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
 
             if height != 600 or width != 800:
@@ -322,11 +335,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Udacity SDC: System Integration - Auto Data Collector with Classifier')
     parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     parser.add_argument('outfilename', type=str, default=defaultOutput, help='jpeg output file pattern')
+    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
     args = parser.parse_args()
     jpgout = args.outfilename
     camera_topic = args.cameratopic
+    config_file = args.trafficconfig
 
     try:
-        autoTLDataCollector(jpgout, camera_topic)
+        autoTLDataCollector(jpgout, camera_topic, config_file)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start auto traffric light data collector.')
