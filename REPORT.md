@@ -6,9 +6,9 @@
 2. Rosbag image samples are real world samples for classifier training/testing
 3. Carla should not go any further than the last waypoint given (no looping).
 4. Safety driver will be present when testing with Carla in the field.
-5. For safety reasons, throttle and brake commands are limited to 80% actuation.  This may limit the vehicle's ability to reach its intended velocity.
+5. For safety reasons, throttle and brake commands are limited to __0.025%__ actuation for Carla and __80%__ for the simulator.  This may limit the vehicle's ability to reach its intended velocity.
 6. The Green Light in the simulator is still too quick (around 2 seconds).  In order to ensure that the vehicle does not cross the intersection on a red light, the system will test if at its current velocity, it can reach the traffic light in 2 seconds.  If not, it will prefer to slow down for a second chance later when it reaches within 5 meters of the traffic light and stops.
-7. Tested with Simulator with 40kmph, 40mph and 10mph speed settings.  _NOTE: Because of the throttle and braking command limits set to 80%, some speed settings could not be reached during testing._
+7. Tested with Simulator with 40kmph, 20mph and 10mph speed settings.  _NOTE: Because of the throttle and braking command limits set to 80% for the simulator, some speed settings could not be reached during testing._
 8. Note: When manually moving the vehicle to a position in the track, make sure to start the system up with the `Manual` checkbox still checked.  Once the system is completely initialized with its classifier loaded and working, you may uncheck the `Manual` checkbox to engage the system.
 
 ## Custom Diagnostic Tools
