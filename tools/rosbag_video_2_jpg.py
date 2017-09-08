@@ -34,7 +34,7 @@ pose = None
 
 # ***** main loop *****
 if __name__ == "__main__":
-  defaultOutput = 'out%04d.mp4'
+  defaultOutput = 'out%04d.jpg'
   parser = argparse.ArgumentParser(description='Udacity SDC Challenge-2 Video viewer 2')
   parser.add_argument('--datasets', type=str, default="dataset1.bag:dataset2.bag:dataset3.bag:dataset4.bag", help='Dataset/ROS Bag name')
   parser.add_argument('outfilename', type=str, default=defaultOutput, help='jpeg output file pattern')

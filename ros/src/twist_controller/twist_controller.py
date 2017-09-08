@@ -4,15 +4,13 @@ import numpy as np
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
-max_throttle_percentage = 0.8
-max_brake_percentage = 0.8
 
 
 class Controller(object):
     def __init__(self, *args, **kwargs):
         # DONE: Implement
         self.sample_time = 0.02
-        if len(args) == 8:
+        if len(args) == 10:
             self.wheel_base = args[0]
             self.steer_ratio = args[1]
             self.min_speed = args[2]
@@ -21,8 +19,10 @@ class Controller(object):
             self.vehicle_mass = args[5]
             self.wheel_radius = args[6]
             self.brake_deadband = args[7]
+            self.max_throttle_percentage = args[8]
+            self.max_braking_percentage = args[9]
             self.lowpass = LowPassFilter(self.accel_limit, self.sample_time)
-            self.pid = PID(2.0, 0.4, 0.1, mn=-0.8, mx=0.8)
+            self.pid = PID(2.0, 0.4, 0.1, mn=self.max_braking_percentage, mx=self.max_throttle_percentage)
 
     def control(self, *args, **kwargs):
         # TODO: Change the arg, kwarg list to suit your needs
@@ -43,12 +43,12 @@ class Controller(object):
                         throttle = -0.01
                     else:
                         factor = self.ideal_linear_velocity
-                        throttle = np.max([np.min([4*(self.ideal_linear_velocity-self.current_linear_velocity+0.1)/factor, max_throttle_percentage]), -max_brake_percentage])
+                        throttle = np.max([np.min([4*(self.ideal_linear_velocity-self.current_linear_velocity+0.1)/factor, self.max_throttle_percentage]), self.max_braking_percentage])
                     # throttle = self.pid.step(((self.ideal_linear_velocity-self.current_linear_velocity)/factor), self.sample_time)
                     # throttle = 2.*(self.ideal_linear_velocity-self.current_linear_velocity)/factor
                 elif self.current_linear_velocity > 0.1:
                     factor = self.current_linear_velocity
-                    throttle = np.max([np.min([4*(self.ideal_linear_velocity-self.current_linear_velocity-0.1)/factor, max_throttle_percentage]), -max_brake_percentage])
+                    throttle = np.max([np.min([4*(self.ideal_linear_velocity-self.current_linear_velocity-0.1)/factor, self.max_throttle_percentage]), self.max_braking_percentage])
                 else:
                     throttle = -0.01
                 if throttle < 0.:

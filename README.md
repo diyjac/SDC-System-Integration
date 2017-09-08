@@ -4,6 +4,7 @@ This is Team Vulture project repo for the final project of the Udacity Self-Driv
 
 NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
 
+
 ### The Team
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
@@ -172,7 +173,7 @@ CSV files with pose and manually updated labels:
 * [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
 * [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
 
-SDC System Integration Carla Test Course Map from rosbag sample:
+SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
 
 ![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
@@ -211,4 +212,8 @@ rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
 cd SDC-System-Integration/ros
 roslaunch launch/site.launch
 ```
+
+### Team Vulture Performance
+#### 1. First team to move Carla
+[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
 

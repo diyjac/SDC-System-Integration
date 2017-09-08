@@ -21,7 +21,7 @@ import os
 MPS = 0.44704
 
 class GenerateDiagnostics():
-    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, camera_topic, config_file):
+    def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, rate, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('diag_gps')
 
@@ -59,8 +59,7 @@ class GenerateDiagnostics():
         self.bridge = CvBridge()
 
         # test different raw image update rates:
-        # 1/2 - one frame every two seconds # don't take too much resources away from the computer...
-        self.updateRate = 0.5 # once every 2 seconds
+        self.updateRate = rate # rate (Hz) every second
 
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
@@ -468,9 +467,10 @@ if __name__ == "__main__":
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
     parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
     parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
+    parser.add_argument('--rate', type=int, default='1', help='refresh rate in Hz')
     args = parser.parse_args()
 
     try:
-        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic, args.trafficconfig)
+        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), int(args.rate), args.cameratopic, args.trafficconfig)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')
