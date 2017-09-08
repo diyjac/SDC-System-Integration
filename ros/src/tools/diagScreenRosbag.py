@@ -23,7 +23,7 @@ MPS = 0.44704
 class GenerateDiagnostics():
     def __init__(self, img_vis_ratio, max_history, text_spacing, font_size, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
-        rospy.init_node('diag_gps')
+        rospy.init_node('diag_gps_rosbag')
 
         self.restricted_speed = 10.
         self.cv_image = None
