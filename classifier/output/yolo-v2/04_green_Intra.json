@@ -1,0 +1,3 @@
+[{"label":"car","confidence":0.83,"topleft":{"x":1260,"y":1711},"bottomright":{"x":1488,"y":1936}},
+{"label":"car","confidence":0.67,"topleft":{"x":426,"y":1663},"bottomright":{"x":1089,"y":2157}},
+{"label":"traffic light","confidence":0.62,"topleft":{"x":2742,"y":1081},"bottomright":{"x":2914,"y":1385}}]

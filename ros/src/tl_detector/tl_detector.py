@@ -11,7 +11,7 @@ import math
 import numpy as np
 import tf
 import cv2
-from traffic_light_config import config
+import yaml
 
 label = ['RED', 'YELLOW', 'GREEN', '', 'UNKNOWN']
 
@@ -30,9 +30,11 @@ class TLDetector(object):
         self.wlen = 0
         self.camera_image = None
         self.lights = []
-        self.updateRate = 2 # 2Hz
+        self.updateRate = 10 # 3Hz
         self.nwp = None
         self.traffic_light_to_waypoint_map = []
+        self.attribute = "NONE"
+        self.has_image = False
 
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -46,15 +48,27 @@ class TLDetector(object):
         '''
         self.sub_raw_image = None
 
-        self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
+        config_string = rospy.get_param("/traffic_light_config")
+        self.config = yaml.load(config_string)
+
+        self.upcoming_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier(rospy.get_param('~model_path'))
+        self.path = rospy.get_param('~model_path')
+        self.camera_topic =  rospy.get_param('~camera_topic')
 
+        if self.path != "NONE":
+            self.light_classifier = TLClassifier(self.path)
+        else:
+            self.light_classifier = None
+
+        self.init = True
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
+        self.ntlwp = None
+        self.sub_raw_image = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
 
         # don't spin - control our resource usage!
         self.loop()
@@ -63,16 +77,19 @@ class TLDetector(object):
         # throttle our traffic light lookup until we are within range
         rate = rospy.Rate(self.updateRate)
         while not rospy.is_shutdown():
-            if self.waypoints and self.theta:
-                self.nwp = self.nextWaypoint(self.pose)
-                self.ntlwp = self.getNextLightWaypoint(LOOKAHEAD_WPS)
-                if self.ntlwp is not None and self.sub_raw_image is None:
-                    self.sub_raw_image = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
-                elif self.ntlwp is None and self.sub_raw_image is not None:
-                    self.sub_raw_image.unregister()
-                    self.sub_raw_image = None
-                    self.last_wp = -1
-                    self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+            if not self.init:
+                if self.waypoints and self.theta:
+                    self.nwp = self.nextWaypoint(self.pose)
+                    self.ntlwp = self.getNextLightWaypoint(LOOKAHEAD_WPS)
+                    if self.ntlwp is not None and self.sub_raw_image is None:
+                        self.sub_raw_image = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
+                    elif self.ntlwp is None and self.sub_raw_image is not None:
+                        self.sub_raw_image.unregister()
+                        self.sub_raw_image = None
+                        self.last_wp = -1
+                        self.upcoming_light_pub.publish(Int32(self.last_wp))
+            elif self.light_classifier is None:
+                self.upcoming_light_pub.publish(Int32(-1))
             rate.sleep()
 
     def pose_cb(self, msg):
@@ -85,8 +102,11 @@ class TLDetector(object):
             self.orientation.z,
             self.orientation.w])
         self.theta = euler[2]
-        if self.light_classifier.predict is None:
-            print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR...."
+        if self.light_classifier is not None:
+            if self.light_classifier.predict is None:
+                print "NOT MOVING!   Initializing TRAFFIC LIGHT DETECTOR....", self.attribute, self.camera_topic, self.has_image
+        else:
+            print "WARNING!   NO TRAFFIC LIGHT DETECTOR...."
 
     def waypoints_cb(self, msg):
         # make our own copy of the waypoints - they are static and do not change
@@ -131,21 +151,26 @@ class TLDetector(object):
             self.state = state
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
-            light_wp = light_wp if state == TrafficLight.RED else -1
+            if state == TrafficLight.GREEN and light_wp is not None:
+                light_wp = -light_wp
+            elif state == TrafficLight.UNKNOWN:
+                light_wp = -1
             self.last_wp = light_wp
-            self.upcoming_red_light_pub.publish(Int32(light_wp))
+            self.upcoming_light_pub.publish(Int32(light_wp))
         else:
-            self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+            self.upcoming_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
+        if self.init:
+            self.init = False
 
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        for lidx in range(len(config.light_positions)):
+        for lidx in range(len(self.config['light_positions'])):
             dist = 100000.
             tlwp = 0
             for widx in range(len(self.waypoints)):
-                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                d1 = dl(self.waypoints[widx].pose.pose.position, self.config['light_positions'][lidx])
                 if dist > d1:
                     tlwp = widx
                     dist = d1
@@ -192,8 +217,8 @@ class TLDetector(object):
 
                 # is it within the given number?
                 if tlwp < number-2:
-                    # is it within our traffic light tracking distance of 40 meters?
-                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 40.:
+                    # is it within our traffic light tracking distance of 100 meters?
+                    if self.distance(self.waypoints, self.nwp, (self.nwp+tlwp)%self.wlen) < 100.:
                         # set the traffic light waypoint target
                         # light = (self.nwp+tlwp)%self.wlen
                         # use relative waypoint ahead of current one instead!
@@ -214,7 +239,14 @@ class TLDetector(object):
             self.prev_light_loc = None
             return TrafficLight.RED
 
-        self.camera_image.encoding = "rgb8"
+        # fixing convoluted camera encoding...
+        if hasattr(self.camera_image, 'encoding'):
+            self.attribute = self.camera_image.encoding
+            if self.camera_image.encoding == '8UC3':
+                self.camera_image.encoding = "rgb8"
+        else:
+            self.camera_image.encoding = 'rgb8'
+
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
         if self.row != 600 or self.col != 800:
             image = cv2.resize(cv_image, (800, 600), interpolation=cv2.INTER_AREA)
@@ -222,7 +254,10 @@ class TLDetector(object):
             image = np.copy(cv_image)
 
         #Get classification
-        classification = self.light_classifier.get_classification(image)
+        if self.light_classifier is not None:
+            classification = self.light_classifier.get_classification(image)
+        else:
+            classification = TrafficLight.UNKNOWN
         print "traffic light: ", label[classification]
         return classification
 
@@ -244,8 +279,12 @@ class TLDetector(object):
 
         """
         #DONE find the closest visible traffic light (if one exists within LOOKAHEAD_WPS)
-        if self.ntlwp:
+        if self.init:
+            state = self.get_light_state(0)
+            return -1, TrafficLight.UNKNOWN
+        elif self.ntlwp:
             state = self.get_light_state(self.ntlwp)
+            # state = TrafficLight.RED
             return self.ntlwp, state
         return -1, TrafficLight.UNKNOWN
 

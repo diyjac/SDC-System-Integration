@@ -2,17 +2,31 @@
 
 This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
 
+NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
+
+
 ### The Team
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
 
-The following are the member of Team Vulture.
+The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
 
-* __Team Lead__: John Chen, diyjac@gmail.com
-* Rainer Bareiß, rainer_bareiss@gmx.de
-* Sebastian Trick, sebastian.trick@gmail.com
-* Yuesong Xie, cedric_xie@hotmail.com
-* Kungfeng Chen, kunfengchen@live.com
+<!---* __Team Lead__: John Chen, diyjac@gmail.com--->
+<!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
+<!---* Sebastian Trick, sebastian.trick@gmail.com--->
+<!---* Yuesong Xie, cedric_xie@hotmail.com--->
+<!---* Kungfeng Chen, kunfengchen@live.com--->
+
+|              | Name      |  E-Mail         | Image |
+|--------------|-----------|-----------------|--------------------------------
+| __Team Lead__| John Chen | diyjac@gmail.com| <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß| rainer_bareiss@gmx.de | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick| sebastian.trick@gmail.com | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kungfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
+
+
+
 
 __GO VULTURE!__
 
@@ -34,7 +48,7 @@ __GO VULTURE!__
   * [Dataspeed DBW](https://bitbucket.org/DataspeedInc/dbw_mkz_ros)
   * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
 
-* Download the [Udacity Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/v0.1).
+* Download the [Udacity Simulator v1.2](https://github.com/udacity/CarND-Capstone/releases/tag/v1.2).
 
     __NOTE__: *If you are installing in native Ubuntu 16.04, the Dataspeed DBW One Line SDK binary install will auto install 4.4.0-92-generic Linux kernel, which will break CUDA and the NVIDIA 375 drivers if you have NVIDIA GPU in your native Ubuntu 16.04 build.  This will cause starting the simulator to fail because it can no longer open the OpenGL drivers provided by NVIDIA:*
 
@@ -104,10 +118,10 @@ roslaunch launch/styx.launch
 ```
 5. Run the simulator
 ```bash
-unzip lights_no_cars.zip
-cd lights_no_cars
-chmod +x ros_test.x86_64
-./ros_test.x86_64
+unzip linux_sys_int.zip
+cd linux_sys_int
+chmod +x system_integration.x86_64
+./system_integration.x86_64
 ```
 6. To test grab a raw camera image
 ```bash
@@ -159,7 +173,7 @@ CSV files with pose and manually updated labels:
 * [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
 * [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
 
-SDC System Integration Carla Test Course Map from rosbag sample:
+SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
 
 ![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
@@ -172,3 +186,34 @@ cd ros
 rosrun tools autoTLDataCollector.py mysamples/session1
 ```
 ![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)
+
+The ROS Graph was updated as follows  
+
+![./imgs/updated_ROS_graph.png](./imgs/updated_ROS_graph.png)
+
+as we were informed by Udacity 
+
+![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
+
+that the obstacle node is currently not implemented in the simulator. 
+
+### Real world testing
+1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
+2. Unzip the file
+```bash
+unzip traffic_light_bag_files.zip
+```
+3. Play the bag file
+```bash
+rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
+```
+4. Launch your project in site mode
+```bash
+cd SDC-System-Integration/ros
+roslaunch launch/site.launch
+```
+
+### Team Vulture Performance
+#### 1. First team to move Carla
+[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
+

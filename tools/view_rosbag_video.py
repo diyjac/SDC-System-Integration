@@ -77,7 +77,7 @@ if __name__ == "__main__":
   config = tf.ConfigProto(log_device_placement=True)
   config.gpu_options.per_process_gpu_memory_fraction = 0.2  # don't hog all the VRAM!
   config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
-  sess = tf.Session(config=self.config)
+  sess = tf.Session(config=config)
   saver = tf.train.import_meta_graph(model_path + '/checkpoints/generator.ckpt.meta')
   saver.restore(sess,tf.train.latest_checkpoint(model_path + '/checkpoints/'))
 

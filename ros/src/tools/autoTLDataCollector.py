@@ -14,10 +14,11 @@ import sys
 import numpy as np
 import math
 import csv
-from traffic_light_config import config
+import yaml
+import os
 
 class autoTLDataCollector():
-    def __init__(self, session):
+    def __init__(self, session, camera_topic, config_file):
         # initialize and subscribe to the camera image and traffic lights topic
         rospy.init_node('auto_traffic_light_data_collector')
 
@@ -37,6 +38,7 @@ class autoTLDataCollector():
         self.listener = tf.TransformListener()
         self.camera_sub = None
 
+        self.camera_topic = camera_topic
         self.waypoints = None
         self.nwp = None
         self.state = TrafficLight.UNKNOWN
@@ -53,6 +55,11 @@ class autoTLDataCollector():
         self.theta = None
         self.ctl = None
         self.traffic_light_to_waypoint_map = []
+
+        # get traffic light positions
+        with open(os.getcwd()+'/src/tl_detector/'+config_file, 'r') as myconfig:
+            config_string=myconfig.read()
+            self.config = yaml.load(config_string)
 
         # set up session logging
         self.session = 'data/collections/'+session
@@ -96,11 +103,11 @@ class autoTLDataCollector():
     def initializeLightToWaypointMap(self):
         # find the closest waypoint to the given (x,y) of the triffic light
         dl = lambda a, b: math.sqrt((a.x-b[0])**2 + (a.y-b[1])**2)
-        for lidx in range(len(config.light_positions)):
+        for lidx in range(len(self.config['light_positions'])):
             dist = 100000.
             tlwp = 0
             for widx in range(len(self.waypoints)):
-                d1 = dl(self.waypoints[widx].pose.pose.position, config.light_positions[lidx])
+                d1 = dl(self.waypoints[widx].pose.pose.position, self.config['light_positions'][lidx])
                 if dist > d1:
                     tlwp = widx
                     dist = d1
@@ -171,7 +178,7 @@ class autoTLDataCollector():
                 tl_dist = self.dist_to_next_traffic_light()
                 if self.camera_sub is None:
                     if tl_dist is not None and tl_dist < 80.:
-                        self.camera_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_cb)
+                        self.camera_sub = rospy.Subscriber(self.camera_topic, Image, self.image_cb)
                     elif self.ctl is not None:
                         if self.img_rows is not None:
                             color = (192, 192, 192)
@@ -217,7 +224,14 @@ class autoTLDataCollector():
         if len(self.lights) > 0:
             height = int(msg.height)
             width = int(msg.width)
-            msg.encoding = "rgb8"
+
+            # fixing convoluted camera encoding...
+            if hasattr(msg, 'encoding'):
+                if msg.encoding == '8UC3':
+                    msg.encoding = "rgb8"
+            else:
+                msg.encoding = 'rgb8'
+
             self.cv_image = self.bridge.imgmsg_to_cv2(msg, "rgb8")
 
             if self.pose is not None and self.ctl is not None:
@@ -261,11 +275,15 @@ class autoTLDataCollector():
 if __name__ == "__main__":
     defaultOutput = 'autoout%04d.jpg'
     parser = argparse.ArgumentParser(description='Udacity SDC: System Integration - Auto Data Collector')
+    parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
+    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
     parser.add_argument('outfilename', type=str, default=defaultOutput, help='jpeg output file pattern')
     args = parser.parse_args()
     jpgout = args.outfilename
+    topic = args.cameratopic
+    config_file = args.trafficconfig
 
     try:
-        autoTLDataCollector(jpgout)
+        autoTLDataCollector(jpgout, topic, config_file)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start auto traffric light data collector.')

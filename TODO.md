@@ -5,5 +5,6 @@
 5. ~~Set up an automatic traffic light image grabber/labeler from simulator for tl_classifier training.~~
 6. ~~Start up GAN network semi-supervised learning training on available train, validate and test sets~~
 7. ~~Integrate multiple `light_classification` solutions in their own local branches for integrated testing.~~
-8. Complete Development and Integration Test Report
-9. Submit Project
+8. ~~Test at 40kmph, 40mph and 10mph speed settings.  NOTE: 40mph was not reached, could be because of 80% throttle limit.~~
+9. ~~Complete Development and Integration Test Report~~
+10. ~~Submit Project~~
