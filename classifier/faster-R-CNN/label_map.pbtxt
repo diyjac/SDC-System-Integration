@@ -1,70 +1,56 @@
 item {
-  name: "/m/01g317"
   id: 1
-  display_name: "Green"
+  name: "Green"
 }
 item {
-  name: "/m/0199g"
   id: 2
-  display_name: "Red"
+  name: "Red"
 }
 item {
-  name: "/m/0k4j"
   id: 3
-  display_name: "GreenLeft"
+  name: "GreenLeft"
 }
 item {
-  name: "/m/04_sv"
   id: 4
-  display_name: "GreenRight"
+  name: "GreenRight"
 }
 item {
-  name: "/m/05czz6l"
   id: 5
-  display_name: "RedLeft"
+  name: "RedLeft"
 }
 item {
-  name: "/m/01bjv"
   id: 6
-  display_name: "RedRight"
+  name: "RedRight"
 }
 item {
-  name: "/m/07jdr"
   id: 7
-  display_name: "Yellow"
+  name: "Yellow"
 }
 item {
-  name: "/m/07r04"
   id: 8
-  display_name: "off"
+  name: "off"
 }
 item {
-  name: "/m/019jd"
   id: 9
-  display_name: "RedStraight"
+  name: "RedStraight"
 }
 item {
-  name: "/m/015qff"
   id: 10
-  display_name: "GreenStraight"
+  name: "GreenStraight"
 }
 item {
-  name: "/m/01pns0"
   id: 11
-  display_name: "GreenStraightLeft"
+  name: "GreenStraightLeft"
 }
 item {
-  name: "/m/02pv19"
   id: 12
-  display_name: "GreenStraightRight"
+  name: "GreenStraightRight"
 }
 item {
-  name: "/m/015qbp"
   id: 13
-  display_name: "RedStraightLeft"
+  name: "RedStraightLeft"
 }
 item {
-  name: "/m/0cvnqh"
   id: 14
-  display_name: "RedStraightRight"
+  name: "RedStraightRight"
 }
