@@ -85,6 +85,7 @@ if __name__ == "__main__":
   tf_graph = tf.get_default_graph()
   input_real = tf_graph.get_tensor_by_name("input_real:0")
   drop_rate = tf_graph.get_tensor_by_name("drop_rate:0")
+  logits = tf_graph.get_tensor_by_name("confidence:0")
   predict = tf_graph.get_tensor_by_name("predict:0")
 
   while bags.has_data():
@@ -117,14 +118,17 @@ if __name__ == "__main__":
               img = bridge.imgmsg_to_cv2(msg, "rgb8")
               if height != 600 or width != 800:
                 img2 = cv2.resize(bridge.imgmsg_to_cv2(msg, "rgb8"), (800, 600), interpolation=cv2.INTER_AREA)
-              pred = sess.run(predict, feed_dict = {
+              tllogits, pred = sess.run([logits, predict], feed_dict = {
                 input_real: scale(img2.reshape(-1, 600, 800, 3)),
                 drop_rate:0.})
-
+              tl_logits = np.delete(tllogits[:3], np.argmin(tllogits[:3]))
+              confidence = np.max(tl_logits) - np.min(tl_logits)
+              if confidence < 2.:
+                  pred[0] = 4
               color = (192, 192, 0)
-              text = 'Most Likely: %s'
+              text = 'Most Likely: %s, confidence: %f'
               font = cv2.FONT_HERSHEY_COMPLEX
-              cv2.putText(img, text%(label[pred[0]]), (100, height-60), font, 1, color, 2)
+              cv2.putText(img, text%(label[pred[0]], confidence), (100, height-60), font, 1, color, 2)
               sim_img = pygame.image.fromstring(img.tobytes(), size, 'RGB')
 
               screen.blit(sim_img, (0,0))
