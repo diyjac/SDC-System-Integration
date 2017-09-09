@@ -30,9 +30,9 @@ This tool dumps out the current position and steering angle of the vehicle in th
 8. __dumpFinalWaypoints.py__
 This tool dumps out the final waypoints from the waypoint updater into a CSV file.
 9. __fakeGreenLight.py__
-This tool force sends -1 waypoint message to force the vehicle to move during testing when the traffic light classifier is misbehaving. 
+This tool force sends -1 waypoint message to force the vehicle to move during testing when the traffic light classifier is misbehaving.
 10. __autoTLDataCollector.py__
-This tool will automatically collect pictures of the front vehicle camera and labels them for classification while it is driving in the simulator. 
+This tool will automatically collect pictures of the front vehicle camera and labels them for classification while it is driving in the simulator.
 11. __diagScreen.py__
 This tool is a combination of most of the tools above including charts of the vehicle's speed, throttle, brake and steering.
 12. __diagScreenWithClassifier.py__
@@ -62,13 +62,27 @@ Where possible, we tried to decrease the amount of time spinning in a ROS node, 
 The following were observed during development on the project relating to waypoints.
 
 #### 2.1 Waypoint Updater
+
+A flowchart of the class WaypointUpdater is shown as follows.
+
+![./imgs/report/figure_waypoint_updater.png](./imgs/report/figure_waypoint_updater.png)
+
 We found that the waypoint updater were reading from the /base_waypoints more often than it should - particularly since the data it contain were static.  We made the system read the topic once and then unregister from the topic so it would no longer recieve any further messages until it is restarted.
 
 #### 2.2 Drive By Wire
+
+A flowchart of the class DBWNode is shown as follows.
+
+![./imgs/report/figure_DBW_node.png](./imgs/report/figure_DBW_node.png)
+
 The drive by wire (dbw) node was tough to correctly impliment.  The diagScreen tool help us tremendously by showing us how the actuators application effected the vehicle's velocity and direction of motion.  Using this information, we were able to better update both the waypoint updater and the dbw to handle the vehicle better.
 
 ### 3. Stopping at Traffic Lights
 Generating the smooth velocity to stop at the traffic light was tough!  We had issues with being able to stop within 5 meters of the traffic light.  A lot of the time we would miss and go into the intersection.  What we eventually did was to made different stop zones 2, 4, 6 and 10 meters from the traffic light.  This helped us to force the vehicle to slow down enough to apply the brake and stop.  This worked most of the time until we integrated the traffic light detector.  After that we have to start planning to stop the vehicle even further back from 40 meters away.
+
+A flowchart of the class TLDetector is shown as follows.
+
+![./imgs/report/figure_TLDetector_node.png](./imgs/report/figure_TLDetector_node.png)
 
 #### 3.1 Traffic Light Waypoint Mapper
 The calculating of the current traffic light and the set of 200 waypoints that are part of the final waypoints sent to the drive by wire node were taking too long.  We eventually settled on mapping the static location of the traffic lights to the static location of their nearest waypoint.  This mapping was done once at the beginning during initialization and help us reduce the amount of processing the system needed.
@@ -120,4 +134,3 @@ We updated the traffic light detector so as to make it not retrieve camera image
 As requested by Udacity, the system will stop Carla at the last waypoint, as shown below:
 
 ![./imgs/last_waypoint.jpg](./imgs/last_waypoint.jpg)
-
