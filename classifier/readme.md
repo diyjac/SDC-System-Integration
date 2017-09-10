@@ -276,16 +276,83 @@ Applying a [color classifier](https://github.com/algolia/color-extractor) from g
 
 ![GAN Simulator Accuracy](../imgs/GAN-sim-accuracy.png)
 
-This is the approach that went into final release code and is described in further detail in the Jupyter notebooks.  This GAN model is based on the Tensorflow model as described in Udacity AIND term 2, Semisupervised Learning section:
+This is the approach that went into final release code for the simulator traffic light detector and is described in further detail in the Jupyter notebooks.  The model reached 100% actuacy for the simulator test dataset, but had a hard time identifying RED lights in the front camera images from the sample rosbags that Udacity provided.  This GAN model is based on the Tensorflow model as described in Udacity AIND term 2, Semisupervised Learning section:
 
 *  Traffic Light GAN for Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised.ipynb)
 *  Refined Traffic Light GAN for New Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb)
 *  Traffic Light GAN for Carla via ROSBAG: [GAN-Semi-Supervised-site/gan_semi_supervised.ipynb](./GAN-Semi-Supervised-site/gan_semi_supervised.ipynb)
 
-## 2.5 [Haar Classifier](http://coding-robin.de/2013/07/22/train-your-own-opencv-haar-classifier.html)
+## 2.5 Tensorflow Model: Object Detection API
+
+![Tensorflow Object Detection API](https://github.com/tensorflow/models/raw/master/object_detection/g3doc/img/kites_detections_output.jpg)
+
+[Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/object_detection) is a accurate machine learning model capable of localizing and identifying multiple objects in a single image.  The API is an open source framework built on top of Tensorflow that makes it easy to construct, train and deploy object detection models.  Rainer first tested the API with a pre-trained model to see how well it worked with the rosbag front camera image dataset, and the results, as shown below was indeed very promising:
+
+![Tensorflow Object Detectin API against Rosbag image](../imgs/tensorflow-object-detection-api-rosbag-test-rainer.b.png)
+
+Sebastian then tested this with the rosbag images and here is the resulting Gif:
+
+![Tensorflow Object Detection API Test against Rosbag Video](../imgs/sdc-sysint-tensorflow-objdet-api-rosbag-test.gif)
+
+If you have GPU for re-training the model locally, clone the Tensorflow model github repository, build and test/verify the API environment:
+
+```bash
+cd SDC-System-Integration/classifier/faster-R-CNN
+git clone https://github.com/tensorflow/models.git
+cd models
+sudo apt-get install protobuf-compiler python-pil python-lxml
+protoc object_detection/protos/*.proto --python_out=.
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+python object_detection/builders/model_builder_test.py
+```
+
+Download and extract the pre-trained model and weights from [http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz](http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz) (5gb):
+
+```bash
+python downloadAPITrainedWeights.py
+ls -l faster_rcnn_resnet101_coco_11_06_2017
+total 659048
+-rw-r----- 1 demo demo 196890839 Jun 11 20:58 frozen_inference_graph.pb
+-rw-r----- 1 demo demo  20932156 Jun 11 20:58 graph.pbtxt
+-rw-r----- 1 demo demo 445812832 Jun 11 21:00 model.ckpt.data-00000-of-00001
+-rw-r----- 1 demo demo     40521 Jun 11 21:00 model.ckpt.index
+-rw-r----- 1 demo demo  11175327 Jun 11 21:00 model.ckpt.meta
+```
+We followed the API instruction on how to create the dataset for the API [here](https://github.com/tensorflow/models/blob/master/object_detection/g3doc/using_your_own_dataset.md) and used the pretrained model and weights in a script to help generate the training and validation sets.  We use two pre-generated and hand labeled CSV file to generate our training and validation set.  __NOTE: This has already been done.__
+
+```bash
+python generateRosbagTrainingAndValidationSets.py --infilename just_traffic_light.csv --outfilename data/train.record
+python generateRosbagTrainingAndValidationSets.py --infilename loop_with_traffic_light.csv --outfilename data/test.record
+mkdir models/model
+cp faster_rcnn_resnet101_tl.config models/model
+```
+Retrain the model on the `just_traffic_light.bag` rosbag data:
+```bash
+cd models
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+python object_detection/train.py --logtostderr --pipeline_config=model/faster_rcnn_resnet101_tl.config --train_dir=../data
+```
+On a separate terminal, launch and monitor the training using Tensorboard:
+```bash
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+tensorboard --logdir=../data
+```
+![Tensorboard](../imgs/tensorboard-for-object-detection-api.png)
+
+After the training is complete, freeze the model using the highest checkpoint number (assuming 5161 is for the example):
+```bash
+mkdir data2
+cd models
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+ls ../data/model.ckpt*
+python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../data/model.ckpt-5161 --output_directory ../data2
+```
+
+
+## 2.6 [Haar Classifier](http://coding-robin.de/2013/07/22/train-your-own-opencv-haar-classifier.html)
 
 This approach was an alternative to using yolo and cropping traffic light images and has not been followed.
 
 
-## 2.5 DenseNet
+## 2.7 DenseNet
 The recently published [DenseNet on medium](https://medium.com/@ManishChablani/densenet-2810936aeebb?source=userActivityShare-5cf6967007c8-1503652277) and on [github](https://github.com/flyyufelix/DenseNet-Keras/blob/master/README.md) was one idea we would have tried if needed.

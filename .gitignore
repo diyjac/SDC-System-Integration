@@ -2,5 +2,8 @@
 
 build
 devel
+classifier/faster-R-CNN/models
+classifier/faster-R-CNN/faster_rcnn_resnet101_coco_11_06_2017*
+classifier/faster-R-CNN/data2
 
 profile.tmp
