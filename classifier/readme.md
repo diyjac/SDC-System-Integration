@@ -286,7 +286,7 @@ This is the approach that went into final release code for the simulator traffic
 
 ![Tensorflow Object Detection API](https://github.com/tensorflow/models/raw/master/object_detection/g3doc/img/kites_detections_output.jpg)
 
-[Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/object_detection) is a accurate machine learning model capable of localizing and identifying multiple objects in a single image.  The API is an open source framework built on top of Tensorflow that makes it easy to construct, train and deploy object detection models.  Rainer first tested the API with a pre-trained model to see how well it worked with the rosbag front camera image dataset, and the results, as shown below was indeed very promising:
+[Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/object_detection) is an accurate machine learning model capable of localizing and identifying multiple objects in a single image.  The API is an open source framework built on top of Tensorflow that makes it easy to construct, train and deploy object detection models.  Rainer first tested the API with a pre-trained model to see how well it worked with the rosbag front camera image dataset, and the results, as shown below was indeed very promising:
 
 ![Tensorflow Object Detectin API against Rosbag image](../imgs/tensorflow-object-detection-api-rosbag-test-rainer.b.png)
 
@@ -332,20 +332,22 @@ cd models
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 python object_detection/train.py --logtostderr --pipeline_config=model/faster_rcnn_resnet101_tl.config --train_dir=../data
 ```
+![Tensorflow Object Detection API Training on Traffic Signs](../imgs/tensorflow-object-detection-api-training.png)
 On a separate terminal, launch and monitor the training using Tensorboard:
 ```bash
+cd models
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 tensorboard --logdir=../data
 ```
 ![Tensorboard](../imgs/tensorboard-for-object-detection-api.png)
 
-After the training is complete, freeze the model using the highest checkpoint number (assuming 5161 is for the example):
+After the training is complete, freeze the best model using the highest checkpoint number (assuming 18871 for this example):
 ```bash
 mkdir data2
 cd models
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 ls ../data/model.ckpt*
-python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../data/model.ckpt-5161 --output_directory ../data2
+python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../data/model.ckpt-18871 --output_directory ../data2
 ```
 
 
