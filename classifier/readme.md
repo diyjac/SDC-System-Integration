@@ -349,7 +349,9 @@ export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 ls ../data/model.ckpt*
 python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../data/model.ckpt-18871 --output_directory ../data2
 ```
+Resulting model was able to correctly identify traffic light from the sample rosbag and its current state at high confidence:
 
+![Tensorflow object detection api classifier](../imgs/sdc-sysint-objdet-classifier-predict.gif)
 
 ## 2.6 [Haar Classifier](http://coding-robin.de/2013/07/22/train-your-own-opencv-haar-classifier.html)
 
