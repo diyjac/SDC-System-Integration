@@ -15,6 +15,7 @@ History:
 """
 
 import argparse
+import os
 import sys
 import numpy as np
 import pygame
@@ -23,8 +24,9 @@ import datetime
 import cStringIO
 import serialrosbags
 import cv2
-from cv_bridge import CvBridge
 import tensorflow as tf
+from cv_bridge import CvBridge
+from functools import partial
 
 THRESHOLD = 0.50
 
@@ -36,6 +38,7 @@ screen = None
 
 detect_height = 400
 detect_width = 600
+chunksize = 1024
 
 yellow = (255, 255, 0)
 green = (0, 255, 0)
@@ -53,12 +56,33 @@ def draw_bounding_box(img, boundingbox, color=[0,255,0], thickness=6):
   cv2.line(img, (x2, y2), (x1, y2), color, thickness)
   cv2.line(img, (x1, y2), (x1, y1), color, thickness)
 
+def joinfiles(directory, filename, chunksize=chunksize):
+    print "restoring:", filename, "from directory:", directory
+    if os.path.exists(directory):
+        if os.path.exists(filename):
+            os.remove(filename)
+        output = open(filename, 'wb')
+        chunks = os.listdir(directory)
+        chunks.sort()
+        for fname in chunks:
+            fpath = os.path.join(directory, fname)
+            with open(fpath, 'rb') as fileobj:
+                for chunk in iter(partial(fileobj.read, chunksize), ''):
+                    output.write(chunk)
+        output.close()
+
+
 # ***** main loop *****
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="Udacity SDC ROSBAG: camera video viewer")
   parser.add_argument('--datasets', type=str, default="dataset1.bag:dataset2.bag:dataset3.bag:dataset4.bag", help='Dataset/ROS Bag name')
   parser.add_argument('--skip', type=int, default="0", help='skip seconds')
   args = parser.parse_args()
+  model_path = '../classifier/faster-R-CNN/'
+
+  # if frozen_inference_graph.pb is not reconstituded yet, join it back together
+  if not os.path.exists(model_path+'checkpoints/frozen_inference_graph.pb'):
+    joinfiles(model_path+'frozen_model_chunks', model_path+'checkpoints/frozen_inference_graph.pb')
 
   datasets = args.datasets
   skip = args.skip
@@ -70,14 +94,13 @@ if __name__ == "__main__":
 
   # get the traffic light classifier
   ii = 0
-  model_path = '../classifier/faster-R-CNN/data2/'
   config = tf.ConfigProto(log_device_placement=True)
   config.gpu_options.per_process_gpu_memory_fraction = 0.5  # don't hog all the VRAM!
   config.operation_timeout_in_ms = 50000 # terminate anything that don't return in 50 seconds
   detection_graph = tf.Graph()
   with detection_graph.as_default():
     od_graph_def = tf.GraphDef()
-    with tf.gfile.GFile(model_path+'frozen_inference_graph.pb', 'rb') as fid:
+    with tf.gfile.GFile(model_path+'checkpoints/frozen_inference_graph.pb', 'rb') as fid:
       serialized_graph = fid.read()
       od_graph_def.ParseFromString(serialized_graph)
       tf.import_graph_def(od_graph_def, name='')
@@ -145,7 +168,6 @@ if __name__ == "__main__":
                     textlabel = labels[c]
                     label = clabels[c]
                     color = colors[c]
-                    confidence = 0.
                     cc = classes[0]
                     confidence = scores[0]
                     if cc > 0 and cc < 4 and confidence is not None and confidence > THRESHOLD:

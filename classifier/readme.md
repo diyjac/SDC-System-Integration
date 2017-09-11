@@ -326,7 +326,7 @@ python generateRosbagTrainingAndValidationSets.py --infilename loop_with_traffic
 mkdir models/model
 cp faster_rcnn_resnet101_tl.config models/model
 ```
-Retrain the model on the `just_traffic_light.bag` rosbag data:
+We updated the model configuration from 300 to 4 max predictions and the number of labels from 900 to 4 to reduce the prediction time from 3 per second to over 13 per second using the [faster_rcnn_resnet101_tl.config](./faster-R-CNN/faster_rcnn_resnet101_tl.config) configuration.  Retrain the model on the `just_traffic_light.bag` rosbag data:
 ```bash
 cd models
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
