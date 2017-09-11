@@ -36,6 +36,7 @@ class TLDetector(object):
         self.traffic_light_to_waypoint_map = []
         self.attribute = "NONE"
         self.has_image = False
+        self.light_classifier = None
 
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
