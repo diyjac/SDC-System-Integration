@@ -150,12 +150,12 @@ rosrun tools diagScreen.py --screensize 2 --maxhistory 800 --textspacing 75 --fo
 * __NOTE__: Requires pygame and moviepy!
 ```
 cd ../tools
-python view_rosbag_video.py --dataset <rosbags>
+python view_rosbag_video_with_objdet.py --dataset <rosbags>
 python rosbag_video_2_mp4.py --dataset <rosbags> <path to mp4 file>
 python rosbag_video_2_gif.py --dataset <rosbags> <path to gif file>
 python rosbag_video_2_jpg.py --dataset <rosbags> '<path to rosbag_%04d.jpg>'
 ```
-![./imgs/just_traffic_light.gif](./imgs/just_traffic_light.gif)
+![./imgs/just_traffic_light.gif](./imgs/sdc-sysint-objdet-classifier-predict.gif)
 ![./imgs/loop_with_traffic_light.gif](./imgs/loop_with_traffic_light.gif)
 
 Full length MP4 videos of the Udacity provided sample rosbags are available for download:
@@ -210,6 +210,7 @@ rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
 4. Launch your project in site mode
 ```bash
 cd SDC-System-Integration/ros
+source devel/setup.bash
 roslaunch launch/site.launch
 ```
 
