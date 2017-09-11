@@ -477,9 +477,10 @@ if __name__ == "__main__":
     parser.add_argument('--textspacing', type=int, default="100", help='Text Spacing: default=100')
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
     parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
+    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
     args = parser.parse_args()
 
     try:
-        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic)
+        GenerateDiagnostics(int(args.screensize), int(args.maxhistory), int(args.textspacing), float(args.fontsize), args.cameratopic, args.trafficconfig)
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start front camera viewer.')

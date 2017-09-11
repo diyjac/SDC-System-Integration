@@ -24,7 +24,7 @@ class TLODClassifier(object):
                 chunks = os.listdir(self.model_path+'/frozen_model_chunks')
                 chunks.sort()
                 for filename in chunks:
-                    filepath = os.path.join(self.model_path+'/checkpoints', filename)
+                    filepath = os.path.join(self.model_path+'/frozen_model_chunks', filename)
                     with open(filepath, 'rb') as fileobj:
                         for chunk in iter(partial(fileobj.read, self.readsize), ''):
                             output.write(chunk)
