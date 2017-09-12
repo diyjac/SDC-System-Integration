@@ -359,6 +359,7 @@ python view_rosbag_video_with_objdet.py --datasets /path/to/just_traffic_light.b
 Resulting model was able to correctly identify traffic light from the sample rosbag and its current state at high confidence:
 
 ![Tensorflow object detection api classifier](../imgs/sdc-sysint-objdet-classifier-predict.gif)
+
 If you want to use your newly generated frozen model weights for deployment, create new frozen chucks:
 ```bash
 cd ../classifier/faster-R-CNN
