@@ -7,6 +7,7 @@ from styx_msgs.msg import Lane
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from light_classification.tl_classifier import TLClassifier
+from light_classification.tl_objdet_classifier import TLODClassifier
 import math
 import numpy as np
 import tf
@@ -25,8 +26,8 @@ class TLDetector(object):
         self.pose = None
         self.theta = None
         self.waypoints = None
-        self.row = 600
-        self.col = 800
+        self.row = None
+        self.col = None
         self.wlen = 0
         self.camera_image = None
         self.lights = []
@@ -35,6 +36,7 @@ class TLDetector(object):
         self.traffic_light_to_waypoint_map = []
         self.attribute = "NONE"
         self.has_image = False
+        self.light_classifier = None
 
         self.sub_current_pose = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         self.sub_waypoints = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -57,10 +59,14 @@ class TLDetector(object):
         self.path = rospy.get_param('~model_path')
         self.camera_topic =  rospy.get_param('~camera_topic')
 
-        if self.path != "NONE":
+        if self.path == "NONE":
+            self.light_classifier = None
+        elif self.path.find("GAN") > 0:
+            self.row = 600
+            self.col = 800
             self.light_classifier = TLClassifier(self.path)
         else:
-            self.light_classifier = None
+            self.light_classifier = TLODClassifier(self.path)
 
         self.init = True
         self.state = TrafficLight.UNKNOWN
@@ -246,16 +252,11 @@ class TLDetector(object):
                 self.camera_image.encoding = "rgb8"
         else:
             self.camera_image.encoding = 'rgb8'
-
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
-        if self.row != 600 or self.col != 800:
-            image = cv2.resize(cv_image, (800, 600), interpolation=cv2.INTER_AREA)
-        else:
-            image = np.copy(cv_image)
 
         #Get classification
         if self.light_classifier is not None:
-            classification = self.light_classifier.get_classification(image)
+            classification = self.light_classifier.get_classification(cv_image)
         else:
             classification = TrafficLight.UNKNOWN
         print "traffic light: ", label[classification]
