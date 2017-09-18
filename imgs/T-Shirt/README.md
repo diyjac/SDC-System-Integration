@@ -1,6 +1,6 @@
 # T-Shirt
 
-![](./T-Shirt-sample-print.jpg)
+![](./T-Shirt-sample-print.png)
 
 This directory contains the template for our T-Shirt print. The file to be used for printing the T-Shirt is 
 [T-Shirt-without-background-for-print.png](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/T-Shirt-without-background-for-print.png)
