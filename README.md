@@ -15,7 +15,7 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 <!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
 <!---* Sebastian Trick, sebastian.trick@gmail.com--->
 <!---* Yuesong Xie, cedric_xie@hotmail.com--->
-<!---* Kungfeng Chen, kunfengchen@live.com--->
+<!---* Kunfeng Chen, kunfengchen@live.com--->
 
 |              | Name      |  E-Mail         | Image |
 |--------------|-----------|-----------------|--------------------------------
