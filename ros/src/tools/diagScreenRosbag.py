@@ -356,15 +356,11 @@ class GenerateDiagnostics():
 
     def drawTrafficLights(self, img, size=10):
         font = cv2.FONT_HERSHEY_COMPLEX
-        for i in range(len(self.lights)):
-            x = self.lights[i].pose.pose.position.x
-            y = self.lights[i].pose.pose.position.y
-            if self.lights[i].state == 0:
-                color = (255, 0, 0)
-            elif self.lights[i].state == 1:
-                color = (255, 255, 0)
-            else:
-                color = (0, 255, 0)
+        for i in range(len(self.traffic_light_to_waypoint_map)):
+            tlidx = self.traffic_light_to_waypoint_map[i]
+            x = self.waypoints[tlidx].pose.pose.position.x
+            y = self.waypoints[tlidx].pose.pose.position.y
+            color = (255, 255, 0)
             cv2.circle(img, (int(x*75+510), int(self.img_rows-(y*75+212))), size, color, -1)
             cv2.putText(img, "%d"%(i), (int(x*75+510-10), int(self.img_rows-(y*75+212)+40)), font, 1, color, 2)
 
@@ -418,7 +414,7 @@ class GenerateDiagnostics():
         ### initialize pygame
         if self.screen is None:
             pygame.init()
-            pygame.display.set_caption("Udacity SDC System Integration Project: Vehicle Diagnostics")
+            pygame.display.set_caption("Udacity SDC System Integration Project: Rosbag Diagnostics")
             self.screen = pygame.display.set_mode((self.img_cols//self.img_vis_ratio,self.img_rows//self.img_vis_ratio), pygame.DOUBLEBUF)
         ## give us a machine view of the world
         self.sim_img = pygame.image.fromstring(cv2.resize(self.cv_image,(self.img_cols//self.img_vis_ratio, self.img_rows//self.img_vis_ratio),
@@ -434,7 +430,7 @@ if __name__ == "__main__":
     parser.add_argument('--textspacing', type=int, default="100", help='Text Spacing: default=100')
     parser.add_argument('--fontsize', type=float, default="2", help='Font Size: default=2')
     parser.add_argument('--cameratopic', type=str, default='/image_color', help='camera ros topic')
-    parser.add_argument('--trafficconfig', type=str, default='sim_traffic_light_config.yaml', help='traffic light yaml config')
+    parser.add_argument('--trafficconfig', type=str, default='site_rosbag_traffic_light_config.yaml', help='traffic light yaml config')
     args = parser.parse_args()
 
     try:
