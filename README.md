@@ -207,7 +207,11 @@ unzip traffic_light_bag_files.zip
 ```bash
 rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
 ```
-4. Launch your project in site mode
+4. Run the Rosbag Diagnostics
+```bash
+rosrun tools diagScreenRosbag.py
+```
+5. Launch your project in site mode
 ```bash
 cd SDC-System-Integration/ros
 source devel/setup.bash
@@ -217,4 +221,5 @@ roslaunch launch/site.launch
 ### Team Vulture Performance
 #### 1. First team to move Carla
 [![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
-
+#### 2. First team to successfully navigate Carla in test track
+[![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
