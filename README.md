@@ -223,3 +223,4 @@ roslaunch launch/site.launch
 [![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
 #### 2. First team to successfully navigate Carla in test track
 [![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
+![Team Vulture Project Completion](./imgs/project-completion-final.png)
