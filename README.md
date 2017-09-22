@@ -30,7 +30,7 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 
 __GO VULTURE!__
 
-### Installation 
+### Installation
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop). 
 * If using a Virtual Machine to install Ubuntu, use the following configuration as minimum:
@@ -62,7 +62,7 @@ __GO VULTURE!__
     * reinstall the NVIDIA 375 drivers (follow the instructions):
 
         [https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics](https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics)
-    
+
 ### Usage
 
 1. Clone the project repository
@@ -173,9 +173,6 @@ CSV files with pose and manually updated labels:
 * [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
 * [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
 
-SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
-
-![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
 11. Sample training, validation and testing images have been collected and are in [data/collections/samples](./data/collections/samples) directory.  There is a [session1.csv](./data/collections/samples/session1.csv) file that will provide the features and labels.  To collect additional training, validation and testing images for the traffic light classifier, use the `autoTLDataCollector.py` tool once you have started `roslaunch launch/styx.launch` and the simulator:
 
@@ -187,15 +184,21 @@ rosrun tools autoTLDataCollector.py mysamples/session1
 ```
 ![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)
 
-The ROS Graph was updated as follows  
+The ROS Graph was updated as follows
 
 ![./imgs/updated_ROS_graph.png](./imgs/updated_ROS_graph.png)
 
-as we were informed by Udacity 
+as we were informed by Udacity
 
 ![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
 
-that the obstacle node is currently not implemented in the simulator. 
+that the obstacle node is currently not implemented in the simulator.
+
+12. We did a complete analysis of the two Udacity sample Rosbags using the following Jupyter Notebook: [tools/data_visualization.ipynb](./tools/data_visualization.ipynb)
+
+SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
+
+![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
 ### Real world testing
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
@@ -215,8 +218,9 @@ rosrun tools diagScreenRosbag.py
 ```bash
 cd SDC-System-Integration/ros
 source devel/setup.bash
-roslaunch launch/site.launch
+roslaunch launch/site-rosbag.launch
 ```
+![New Waypoint Test against Rosbag](./imgs/sdc-sysint-newwaypoints-rosbag-test.gif)
 
 ### Team Vulture Performance
 #### 1. First team to move Carla
