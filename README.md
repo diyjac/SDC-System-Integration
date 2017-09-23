@@ -25,8 +25,18 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 || Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
 || Kunfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
 
-
-
+### Team Vulture Accomplishments
+#### 1. First team to move Carla
+[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
+#### 2. First team to successfully navigate Carla in test track and stop appropriately for the lights
+[![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
+#### 3. First team to complete Udacity SDCND System Integration Project
+![Team Vulture Project Completion](./imgs/project-completion-final.png)
+#### 4. Team Meeting at IAA 2017 in Frankfurt, Germany.
+![Team Vulture meeting at IAA 2017, Frankfurt, Germany](./imgs/Team-Vulture-At-IAA-2017-Frankfurt-Germany.jpg)
+#### 5. Team Meeting at Udacity Europe, SDC 2017 Student Dinner with David Silver
+![Team Meeting at Udacity Europe, SDC 2017 Dinner](./imgs/Team-Vulture-At-Udacity-Europe-SDC-2017.jpg)
+![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
 
 __GO VULTURE!__
 
@@ -221,15 +231,3 @@ source devel/setup.bash
 roslaunch launch/site-rosbag.launch
 ```
 ![New Waypoint Test against Rosbag](./imgs/sdc-sysint-newwaypoints-rosbag-test.gif)
-
-### Team Vulture Accomplishments
-#### 1. First team to move Carla
-[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
-#### 2. First team to successfully navigate Carla in test track and stop appropriately for the lights
-[![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
-![Team Vulture Project Completion](./imgs/project-completion-final.png)
-#### 3. Team Meeting at IAA 2017 in Frankfurt, Germany.
-![Team Vulture meeting at IAA 2017, Frankfurt, Germany](./imgs/Team-Vulture-At-IAA-2017-Frankfurt-Germany.jpg)
-#### 4. Team Meeting at Udacity Europe, SDC 2017 Student Dinner with David Silver
-![Team Meeting at Udacity Europe, SDC 2017 Dinner](./imgs/Team-Vulture-At-Udacity-Europe-SDC-2017.jpg)
-![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
