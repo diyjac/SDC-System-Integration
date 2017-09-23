@@ -230,6 +230,6 @@ roslaunch launch/site-rosbag.launch
 ![Team Vulture Project Completion](./imgs/project-completion-final.png)
 #### 3. Team Meeting at IAA 2017 in Frankfurt, Germany.
 ![Team Vulture meeting at IAA 2017, Frankfurt, Germany](./imgs/Team-Vulture-At-IAA-2017-Frankfurt-Germany.jpg)
-#### 4. Team Meeting at Udacity Europe, SDC 2017 Dinner with David Silver
+#### 4. Team Meeting at Udacity Europe, SDC 2017 Student Dinner with David Silver
 ![Team Meeting at Udacity Europe, SDC 2017 Dinner](./imgs/Team-Vulture-At-Udacity-Europe-SDC-2017.jpg)
 ![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
