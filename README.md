@@ -228,3 +228,8 @@ roslaunch launch/site-rosbag.launch
 #### 2. First team to successfully navigate Carla in test track and stop appropriately for the lights
 [![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
 ![Team Vulture Project Completion](./imgs/project-completion-final.png)
+#### 3. Team Meeting at IAA 2017 in Frankfurt, Germany.
+![Team Vulture meeting at IAA 2017, Frankfurt, Germany](./imgs/Team-Vulture-At-IAA-2017-Frankfurt-Germany.jpg)
+#### 4. Team Meeting at Udacity Europe, SDC 2017 Dinner with David Silver
+![Team Meeting at Udacity Europe, SDC 2017 Dinner](./imgs/Team-Vulture-At-Udacity-Europe-SDC-2017.jpg)
+![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
