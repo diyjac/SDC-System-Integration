@@ -4,6 +4,8 @@ This is Team Vulture project repo for the final project of the Udacity Self-Driv
 
 NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
 
+*WARNING: To maintain integrity of the SDCND Final System Integration Project, the throttle and brake actuation settings in this prepository is __NOT__ what was used in the successful navigation of Carla around the test track.*
+
 
 ### The Team
 
@@ -11,19 +13,13 @@ NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [R
 
 The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
 
-<!---* __Team Lead__: John Chen, diyjac@gmail.com--->
-<!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
-<!---* Sebastian Trick, sebastian.trick@gmail.com--->
-<!---* Yuesong Xie, cedric_xie@hotmail.com--->
-<!---* Kunfeng Chen, kunfengchen@live.com--->
-
-|              | Name      |  E-Mail         | Image |
-|--------------|-----------|-----------------|--------------------------------
-| __Team Lead__| John Chen | diyjac@gmail.com| <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
-|| Rainer Bareiß| rainer_bareiss@gmx.de | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
-|| Sebastian Trick| sebastian.trick@gmail.com | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
-|| Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
-|| Kunfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
+|              | Name      | Image |
+|--------------|-----------|--------------------------------
+| __Team Lead__| John Chen | <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kunfeng Chen | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
 
 ### Team Vulture Accomplishments
 #### 1. First team to move Carla
