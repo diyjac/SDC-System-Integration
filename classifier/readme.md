@@ -306,7 +306,7 @@ export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 python object_detection/builders/model_builder_test.py
 ```
 
-Download and extract the pre-trained model and weights from [http://download.tensorflow.org/models/research/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz](http://download.tensorflow.org/models/research/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz) (5gb):
+Download and extract the pre-trained model and weights from [http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz](http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz) (5gb):
 
 ```bash
 python downloadAPITrainedWeights.py
