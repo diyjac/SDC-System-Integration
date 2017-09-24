@@ -309,6 +309,7 @@ python object_detection/builders/model_builder_test.py
 Download and extract the pre-trained model and weights from [http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz](http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz) (5gb):
 
 ```bash
+cd SDC-System-Integration/classifier/faster-R-CNN
 python downloadAPITrainedWeights.py
 ls -l faster_rcnn_resnet101_coco_11_06_2017
 total 659048
@@ -323,6 +324,9 @@ We followed the API instruction on how to create the dataset for the API [here](
 ```bash
 python generateRosbagTrainingAndValidationSets.py --infilename just_traffic_light.csv --outfilename data/train.record
 python generateRosbagTrainingAndValidationSets.py --infilename loop_with_traffic_light.csv --outfilename data/test.record
+```
+Move the newly created training and validation dataset into position for training:
+```bash
 mkdir models/research/model
 cp faster_rcnn_resnet101_tl.config models/research/model
 ```
