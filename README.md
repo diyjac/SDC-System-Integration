@@ -11,7 +11,7 @@ __WARNING:__ *To maintain integrity of the SDCND Final System Integration Projec
 
 ![Team Vulture Mascot](./imgs/vulture.JPG)
 
-The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
+The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](./imgs/T-Shirt/README.md).
 
 |              | Name      | Image |
 |--------------|-----------|--------------------------------
