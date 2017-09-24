@@ -4,6 +4,8 @@ This is Team Vulture project repo for the final project of the Udacity Self-Driv
 
 NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
 
+__WARNING:__ *To maintain integrity of the SDCND Final System Integration Project, the throttle and brake actuation settings in this prepository is __NOT__ what was used in the successful navigation of Carla around the test track, and the final successful resulting rosbag URL has been red-out.*
+
 
 ### The Team
 
@@ -11,26 +13,30 @@ NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [R
 
 The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](https://github.com/diyjac/SDC-System-Integration/blob/rainer-rev3/imgs/T-Shirt/README.md).
 
-<!---* __Team Lead__: John Chen, diyjac@gmail.com--->
-<!---* Rainer Bareiß, rainer_bareiss@gmx.de--->
-<!---* Sebastian Trick, sebastian.trick@gmail.com--->
-<!---* Yuesong Xie, cedric_xie@hotmail.com--->
-<!---* Kunfeng Chen, kunfengchen@live.com--->
+|              | Name      | Image |
+|--------------|-----------|--------------------------------
+| __Team Lead__| John Chen | <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kunfeng Chen | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
 
-|              | Name      |  E-Mail         | Image |
-|--------------|-----------|-----------------|--------------------------------
-| __Team Lead__| John Chen | diyjac@gmail.com| <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
-|| Rainer Bareiß| rainer_bareiss@gmx.de | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
-|| Sebastian Trick| sebastian.trick@gmail.com | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
-|| Yuesong Xie | cedric_xie@hotmail.com | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
-|| Kunfeng Chen | kunfengchen@live.com | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
-
-
-
+### Team Vulture Accomplishments
+#### 1. First team to move Carla
+[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
+#### 2. First team to successfully navigate Carla in test track and stop appropriately for the lights
+[![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
+#### 3. First team to complete Udacity SDCND System Integration Project
+![Team Vulture Project Completion](./imgs/project-completion-final.png)
+#### 4. Team Meeting at IAA 2017 in Frankfurt, Germany.
+![Team Vulture meeting at IAA 2017, Frankfurt, Germany](./imgs/Team-Vulture-At-IAA-2017-Frankfurt-Germany.jpg)
+#### 5. Team Meeting at Udacity Europe, SDC 2017 Student Dinner with David Silver
+![Team Meeting at Udacity Europe, SDC 2017 Dinner](./imgs/Team-Vulture-At-Udacity-Europe-SDC-2017.jpg)
+![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
 
 __GO VULTURE!__
 
-### Installation 
+### Installation
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop). 
 * If using a Virtual Machine to install Ubuntu, use the following configuration as minimum:
@@ -62,7 +68,7 @@ __GO VULTURE!__
     * reinstall the NVIDIA 375 drivers (follow the instructions):
 
         [https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics](https://askubuntu.com/questions/760934/graphics-issues-after-while-installing-ubuntu-16-04-16-10-with-nvidia-graphics)
-    
+
 ### Usage
 
 1. Clone the project repository
@@ -173,9 +179,6 @@ CSV files with pose and manually updated labels:
 * [./test_images/loop_with_traffic_light.csv](./test_images/loop_with_traffic_light.csv)
 * [./test_images/just_traffic_light.csv](./test_images/just_traffic_light.csv)
 
-SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
-
-![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
 11. Sample training, validation and testing images have been collected and are in [data/collections/samples](./data/collections/samples) directory.  There is a [session1.csv](./data/collections/samples/session1.csv) file that will provide the features and labels.  To collect additional training, validation and testing images for the traffic light classifier, use the `autoTLDataCollector.py` tool once you have started `roslaunch launch/styx.launch` and the simulator:
 
@@ -187,15 +190,21 @@ rosrun tools autoTLDataCollector.py mysamples/session1
 ```
 ![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)
 
-The ROS Graph was updated as follows  
+The ROS Graph was updated as follows
 
 ![./imgs/updated_ROS_graph.png](./imgs/updated_ROS_graph.png)
 
-as we were informed by Udacity 
+as we were informed by Udacity
 
 ![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
 
-that the obstacle node is currently not implemented in the simulator. 
+that the obstacle node is currently not implemented in the simulator.
+
+12. We did a complete analysis of the two Udacity sample Rosbags using the following Jupyter Notebook: [tools/data_visualization.ipynb](./tools/data_visualization.ipynb)
+
+SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
+
+![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
 ### Real world testing
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
@@ -207,14 +216,14 @@ unzip traffic_light_bag_files.zip
 ```bash
 rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
 ```
-4. Launch your project in site mode
+4. Run the Rosbag Diagnostics
+```bash
+rosrun tools diagScreenRosbag.py
+```
+5. Launch your project in site mode
 ```bash
 cd SDC-System-Integration/ros
 source devel/setup.bash
-roslaunch launch/site.launch
+roslaunch launch/site-rosbag.launch
 ```
-
-### Team Vulture Performance
-#### 1. First team to move Carla
-[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
-
+![New Waypoint Test against Rosbag](./imgs/sdc-sysint-newwaypoints-rosbag-test.gif)
