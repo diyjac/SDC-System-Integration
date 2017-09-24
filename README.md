@@ -4,7 +4,7 @@ This is Team Vulture project repo for the final project of the Udacity Self-Driv
 
 NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
 
-*WARNING: To maintain integrity of the SDCND Final System Integration Project, the throttle and brake actuation settings in this prepository is __NOT__ what was used in the successful navigation of Carla around the test track.*
+__WARNING:__ *To maintain integrity of the SDCND Final System Integration Project, the throttle and brake actuation settings in this prepository is __NOT__ what was used in the successful navigation of Carla around the test track, and the final successful resulting rosbag URL has been red-out.*
 
 
 ### The Team
