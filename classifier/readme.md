@@ -325,7 +325,7 @@ We followed the API instruction on how to create the dataset for the API [here](
 python generateRosbagTrainingAndValidationSets.py --infilename just_traffic_light.csv --outfilename data/train.record
 python generateRosbagTrainingAndValidationSets.py --infilename loop_with_traffic_light.csv --outfilename data/test.record
 ```
-Move the newly created training and validation dataset into position for training:
+Move the model training configuration into position for training:
 ```bash
 mkdir models/research/model
 cp faster_rcnn_resnet101_tl.config models/research/model
