@@ -284,9 +284,9 @@ This is the approach that went into final release code for the simulator traffic
 
 ## 2.5 Tensorflow Model: Object Detection API
 
-![Tensorflow Object Detection API](https://github.com/tensorflow/models/raw/master/object_detection/g3doc/img/kites_detections_output.jpg)
+![Tensorflow Object Detection API](https://github.com/tensorflow/models/raw/master/research/object_detection/g3doc/img/kites_detections_output.jpg)
 
-[Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/object_detection) is an accurate machine learning model capable of localizing and identifying multiple objects in a single image.  The API is an open source framework built on top of Tensorflow that makes it easy to construct, train and deploy object detection models.  Rainer first tested the API with a pre-trained model to see how well it worked with the rosbag front camera image dataset, and the results, as shown below was indeed very promising:
+[Tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection) is an accurate machine learning model capable of localizing and identifying multiple objects in a single image.  The API is an open source framework built on top of Tensorflow that makes it easy to construct, train and deploy object detection models.  Rainer first tested the API with a pre-trained model to see how well it worked with the rosbag front camera image dataset, and the results, as shown below was indeed very promising:
 
 ![Tensorflow Object Detectin API against Rosbag image](../imgs/tensorflow-object-detection-api-rosbag-test-rainer.b.png)
 
@@ -299,7 +299,7 @@ If you have GPU for re-training the model locally, clone the Tensorflow model gi
 ```bash
 cd SDC-System-Integration/classifier/faster-R-CNN
 git clone https://github.com/tensorflow/models.git
-cd models
+cd models/research
 sudo apt-get install protobuf-compiler python-pil python-lxml
 protoc object_detection/protos/*.proto --python_out=.
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
@@ -309,6 +309,7 @@ python object_detection/builders/model_builder_test.py
 Download and extract the pre-trained model and weights from [http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz](http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz) (5gb):
 
 ```bash
+cd SDC-System-Integration/classifier/faster-R-CNN
 python downloadAPITrainedWeights.py
 ls -l faster_rcnn_resnet101_coco_11_06_2017
 total 659048
@@ -318,36 +319,39 @@ total 659048
 -rw-r----- 1 demo demo     40521 Jun 11 21:00 model.ckpt.index
 -rw-r----- 1 demo demo  11175327 Jun 11 21:00 model.ckpt.meta
 ```
-We followed the API instruction on how to create the dataset for the API [here](https://github.com/tensorflow/models/blob/master/object_detection/g3doc/using_your_own_dataset.md) and used the pretrained model and weights in a script to help generate the training and validation sets.  We use two pre-generated and hand labeled CSV file to generate our training and validation set.  __NOTE: This has already been done.__
+We followed the API instruction on how to create the dataset for the API [here](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/using_your_own_dataset.md) and used the pretrained model and weights in a script to help generate the training and validation sets.  We use two pre-generated and hand labeled CSV file to generate our training and validation set.  __NOTE: This has already been done.__
 
 ```bash
 python generateRosbagTrainingAndValidationSets.py --infilename just_traffic_light.csv --outfilename data/train.record
 python generateRosbagTrainingAndValidationSets.py --infilename loop_with_traffic_light.csv --outfilename data/test.record
-mkdir models/model
-cp faster_rcnn_resnet101_tl.config models/model
+```
+Move the model training configuration into position for training:
+```bash
+mkdir models/research/model
+cp faster_rcnn_resnet101_tl.config models/research/model
 ```
 We updated the model configuration from 300 to 4 max predictions and the number of labels from 900 to 4 to reduce the prediction time from 3 per second to over 13 per second using the [faster_rcnn_resnet101_tl.config](./faster-R-CNN/faster_rcnn_resnet101_tl.config) configuration.  Retrain the model on the `just_traffic_light.bag` rosbag data:
 ```bash
-cd models
+cd models/research
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-python object_detection/train.py --logtostderr --pipeline_config=model/faster_rcnn_resnet101_tl.config --train_dir=../data
+python object_detection/train.py --logtostderr --pipeline_config=model/faster_rcnn_resnet101_tl.config --train_dir=../../data
 ```
 ![Tensorflow Object Detection API Training on Traffic Signs](../imgs/tensorflow-object-detection-api-training.png)
 On a separate terminal, launch and monitor the training using Tensorboard:
 ```bash
-cd models
+cd models/research
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-tensorboard --logdir=../data
+tensorboard --logdir=../../data
 ```
 ![Tensorboard](../imgs/tensorboard-for-object-detection-api.png)
 
 After the training is complete, freeze the best model using the highest checkpoint number (assuming 18871 for this example):
 ```bash
 mkdir data2
-cd models
+cd models/research
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-ls ../data/model.ckpt*
-python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../data/model.ckpt-18871 --output_directory ../data2
+ls ../../data/model.ckpt*
+python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../../data/model.ckpt-18871 --output_directory ../../data2
 ```
 After the frozen model weights have been generated, move it in place into the checkpoints directory and you can test it with the Udacity sample rosbags:
 ```bash
