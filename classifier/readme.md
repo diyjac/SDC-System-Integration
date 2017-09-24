@@ -323,21 +323,21 @@ We followed the API instruction on how to create the dataset for the API [here](
 ```bash
 python generateRosbagTrainingAndValidationSets.py --infilename just_traffic_light.csv --outfilename data/train.record
 python generateRosbagTrainingAndValidationSets.py --infilename loop_with_traffic_light.csv --outfilename data/test.record
-mkdir models/model
-cp faster_rcnn_resnet101_tl.config models/model
+mkdir models/research/model
+cp faster_rcnn_resnet101_tl.config models/research/model
 ```
 We updated the model configuration from 300 to 4 max predictions and the number of labels from 900 to 4 to reduce the prediction time from 3 per second to over 13 per second using the [faster_rcnn_resnet101_tl.config](./faster-R-CNN/faster_rcnn_resnet101_tl.config) configuration.  Retrain the model on the `just_traffic_light.bag` rosbag data:
 ```bash
 cd models/research
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-python object_detection/train.py --logtostderr --pipeline_config=model/faster_rcnn_resnet101_tl.config --train_dir=../data
+python object_detection/train.py --logtostderr --pipeline_config=model/faster_rcnn_resnet101_tl.config --train_dir=../../data
 ```
 ![Tensorflow Object Detection API Training on Traffic Signs](../imgs/tensorflow-object-detection-api-training.png)
 On a separate terminal, launch and monitor the training using Tensorboard:
 ```bash
-cd models
+cd models/research
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-tensorboard --logdir=../data
+tensorboard --logdir=../../data
 ```
 ![Tensorboard](../imgs/tensorboard-for-object-detection-api.png)
 
@@ -346,8 +346,8 @@ After the training is complete, freeze the best model using the highest checkpoi
 mkdir data2
 cd models/research
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-ls ../data/model.ckpt*
-python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../data/model.ckpt-18871 --output_directory ../data2
+ls ../../data/model.ckpt*
+python object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path model/faster_rcnn_resnet101_tl.config --trained_checkpoint_prefix ../../data/model.ckpt-18871 --output_directory ../../data2
 ```
 After the frozen model weights have been generated, move it in place into the checkpoints directory and you can test it with the Udacity sample rosbags:
 ```bash
