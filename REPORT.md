@@ -129,8 +129,49 @@ This is a separate report that can be viewed here: [classifier/readme.md](./clas
 
 #### 3.4 Traffic Light Detector
 We updated the traffic light detector so as to make it not retrieve camera images until it is within 40 meters of a traffic light.  Otherwise, it would unregister from the /raw_camera topic, and only resubscribe when it gets within range.
-
 #### 3.5 Last Waypoint Behavior
 As requested by Udacity, the system will stop Carla at the last waypoint, as shown below:
 
 ![./imgs/last_waypoint.jpg](./imgs/last_waypoint.jpg)
+
+### 4 Obstacle Waypoints
+The ROS Graph was updated as follows
+
+![./imgs/updated_ROS_graph.png](./imgs/updated_ROS_graph.png)
+
+as we were informed by Udacity
+
+![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
+
+that the obstacle node is currently not implemented in the simulator.
+
+### 5 Simulator Integration Testing
+
+We tested this configuration in the Simulator at 40kmph and 10mph speed settings.  You may watch our simulator test videos below:
+
+##### 40kmph Simulator Test
+
+[![Team Vulture Simulator Test at 40kmph](./imgs/40kmph-simulator-test.png)](https://youtu.be/Znhn1LKZFEY)
+
+##### 10mph Simulator Test at 2X speed
+
+[![Team Vulture Simulator Test at 10mph](./imgs/10mph-simulator-test.png)](https://youtu.be/Xgm4EDbJgq0)
+
+
+### 6 Site Testing
+
+Our first site testing was not completely satisficatory.  Our throttle setting was set too high and made Carla very hard to control as can be seen in  our first attempt to make Carla move:
+
+[![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
+
+[![Team Vulture First to Move Carla! - Front Camera](./imgs/vulture-test.png)](https://youtu.be/1TjhlsXzrqU)
+
+In addition, we use the given site waypoints `churchlot_with_cars.csv` which made a counter-clockwise loop around the test track instead of clockwise as recorded in the sample rosbag:
+
+[![Team Vulture following original `churchlot_with_cars.csv` waypoints](./imgs/vulture_loop_speed_adjusted.png)](https://youtu.be/e5UM0yUBtao)
+
+We did a complete analysis of the two Udacity rosbags using the following Jupyter Notebook: [tools/data_visualization.ipynb](./tools/data_visualization.ipynb)
+
+SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
+
+![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)

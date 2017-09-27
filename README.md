@@ -1,10 +1,12 @@
 ## Udacity Self Driving Car Nanodegree Final Project: System Integration
 
+![Carla](./imgs/Carla.png)
+
 This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
 
 NOTE: You will find our development, testing logs and __SAFETY NOTES__ in the [REPORT.md](./REPORT.md) file.
 
-__WARNING:__ *To maintain integrity of the SDCND Final System Integration Project, the throttle and brake actuation settings in this prepository are __NOT__ what were used in the successful navigation of Carla around the test track, and the final successful resulting rosbag URL has been __redacted__.  The last Udacity Capstone Project repository merge pulled into this github repository was on September 9, 2017: [https://github.com/udacity/CarND-Capstone/commit/140691dada1e659422693007eee48c6d5faca14f](https://github.com/udacity/CarND-Capstone/commit/140691dada1e659422693007eee48c6d5faca14f).  Further merges with upstream repository may render the project in this repository inoperable.  The final project results are now __static__, and no further update requests will be expected nor entertained.*
+__WARNING:__ *To maintain integrity of the SDCND Final System Integration Project, the throttle and brake actuation settings in this prepository are __NOT__ what were used in the successful navigation of Carla around the test track.  The last Udacity Capstone Project repository merge pulled into this github repository was on September 9, 2017: [https://github.com/udacity/CarND-Capstone/commit/140691dada1e659422693007eee48c6d5faca14f](https://github.com/udacity/CarND-Capstone/commit/140691dada1e659422693007eee48c6d5faca14f).  Further merges with upstream repository may render the project in this repository inoperable.  The final project results are now __static__, and no further update requests will be expected nor entertained.*
 
 
 ### The Team
@@ -189,22 +191,6 @@ cd ros
 rosrun tools autoTLDataCollector.py mysamples/session1
 ```
 ![./imgs/sdc-sysint-auto-data-collector.gif](./imgs/sdc-sysint-auto-data-collector.gif)
-
-The ROS Graph was updated as follows
-
-![./imgs/updated_ROS_graph.png](./imgs/updated_ROS_graph.png)
-
-as we were informed by Udacity
-
-![./imgs/info-Udacity-ros-graph.png](./imgs/info-Udacity-ros-graph.png)
-
-that the obstacle node is currently not implemented in the simulator.
-
-12. We did a complete analysis of the two Udacity sample Rosbags using the following Jupyter Notebook: [tools/data_visualization.ipynb](./tools/data_visualization.ipynb)
-
-SDC System Integration Carla Test Course Waypoints and Map from rosbag sample:
-
-![./imgs/udacity-test-course-waypoint-map-from-rosbag.png](./imgs/udacity-test-course-waypoint-map-from-rosbag.png)
 
 ### Real world testing
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
