@@ -31,11 +31,16 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 [![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
 #### 3. First team to complete Udacity SDCND System Integration Project
 ![Team Vulture Project Completion](./imgs/project-completion-final.png)
-#### 4. Team Meeting at IAA 2017 in Frankfurt, Germany.
+#### 4. Rainer Bareiß Designed and Made Team Vulture T-Shirts!
+![Kunfeng Team T-Shirt](./imgs/kunfeng_tshirt.jpg)
+![Yuesong Team T-Shirt](./imgs/yuesong_tshirt.jpg)
+#### 5. Team Meeting at IAA 2017 in Frankfurt, Germany.
 ![Team Vulture meeting at IAA 2017, Frankfurt, Germany](./imgs/Team-Vulture-At-IAA-2017-Frankfurt-Germany.jpg)
-#### 5. Team Meeting at Udacity Europe, SDC 2017 Student Dinner with David Silver
+#### 6. Team Meeting at Udacity Europe, SDC 2017 Student Dinner with David Silver
 ![Team Meeting at Udacity Europe, SDC 2017 Dinner](./imgs/Team-Vulture-At-Udacity-Europe-SDC-2017.jpg)
 ![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
+#### 7. Kunfeng Chen and Sebastian Thrun at Udacity Hiring Partner Event in Mountain View, California
+![Kunfeng and Sebastian Thrun](./imgs/kunfeng_and_sebastian.jpg)
 
 __GO VULTURE!__
 
