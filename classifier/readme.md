@@ -272,7 +272,7 @@ This behavior resulted in not following this approach further.
 Applying a [color classifier](https://github.com/algolia/color-extractor) from github just detected a lot of black and grey and no prominent green or red in the images of the dataset nr. 1.3. This approach has not been followed further.
 
 
-## 2.4 GAN
+## 2.4 Generative Adversarial Network (GAN)
 
 ![GAN Simulator Accuracy](../imgs/GAN-sim-accuracy.png)
 
