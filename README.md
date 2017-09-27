@@ -16,8 +16,8 @@ __WARNING:__ *To maintain integrity of the SDCND Final System Integration Projec
 
 The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](./imgs/T-Shirt/README.md).
 
-|              | Name      | Location | Image |
-|--------------|-----------|--------------------------------|
+|              |     Name      | Location | Image |
+|--------------|---------------|----------|--------------------------------|
 | __Team Lead__| John Chen | Ashburn, VA | <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
 || Rainer Bareiß | Stuttgart, Germany | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
 || Sebastian Trick | Karlsruhe, Germany | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
