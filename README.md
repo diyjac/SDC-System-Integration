@@ -41,6 +41,7 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 ![Udacity SDC European Students 2017](./imgs/Udacity-SDC-European-Students-2017.jpg)
 #### 7. Kunfeng Chen and Sebastian Thrun at Udacity Hiring Partner Event 2017 in Mountain View, California
 ![Kunfeng and Sebastian Thrun](./imgs/kunfeng_and_sebastian.jpg)
+![Hiring Partners](./imgs/udacity-hiring-partners.jpg)
 
 __GO VULTURE!__
 

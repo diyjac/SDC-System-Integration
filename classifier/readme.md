@@ -282,6 +282,8 @@ This is the approach that went into final release code for the simulator traffic
 *  Refined Traffic Light GAN for New Simulator: [GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb](./GAN-Semi-Supervised-sim/gan_semi_supervised-new-sim.ipynb)
 *  Traffic Light GAN for Carla via ROSBAG: [GAN-Semi-Supervised-site/gan_semi_supervised.ipynb](./GAN-Semi-Supervised-site/gan_semi_supervised.ipynb)
 
+The key hint for finally solving our traffic lights classifier problem for Carla came from Anthony S in #slack channel #p-system-integration in this post: https://carnd.slack.com/archives/C6NVDVAQ3/p1505181066000108?thread_ts=1505180525.000142&cid=C6NVDVAQ3 using Tensorflow Model: Object Detection API as described below.
+
 ## 2.5 Tensorflow Model: Object Detection API
 
 ![Tensorflow Object Detection API](https://github.com/tensorflow/models/raw/master/research/object_detection/g3doc/img/kites_detections_output.jpg)
@@ -294,7 +296,7 @@ Sebastian then tested this with the rosbag images and here is the resulting Gif:
 
 ![Tensorflow Object Detection API Test against Rosbag Video](../imgs/sdc-sysint-tensorflow-objdet-api-rosbag-test.gif)
 
-If you have GPU for re-training the model locally, clone the Tensorflow model github repository, build and test/verify the API environment:
+The Faster R-CNN really kept the promise of a fast and powerful algorithm when using a retrained model on a small number of our own training images.  If you have GPU for re-training the model locally, clone the Tensorflow model github repository and follow the instructions below to build, test and verify the Object Detection model:
 
 ```bash
 cd SDC-System-Integration/classifier/faster-R-CNN
