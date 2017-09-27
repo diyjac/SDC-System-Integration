@@ -296,7 +296,7 @@ Sebastian then tested this with the rosbag images and here is the resulting Gif:
 
 ![Tensorflow Object Detection API Test against Rosbag Video](../imgs/sdc-sysint-tensorflow-objdet-api-rosbag-test.gif)
 
-The Faster R-CNN really kept the promise of a fast and powerful algorithm when using a retrained model on a small number of our own training images.  If you have GPU for re-training the model locally, clone the Tensorflow model github repository and follow the instructions below to build, test and verify the Object Detection model:
+The Faster R-CNN really kept the promise of a fast and powerful algorithm when using a pretrained model on a small number of our own training images.  If you have GPU for re-training the model locally, clone the Tensorflow model github repository and follow the instructions below to build, test and verify the Object Detection model:
 
 ```bash
 cd SDC-System-Integration/classifier/faster-R-CNN
