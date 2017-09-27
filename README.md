@@ -1,6 +1,6 @@
 ## Udacity Self Driving Car Nanodegree Final Project: System Integration
 
-![Carla](./imgs/Carla.png)
+![Carla](./imgs/Carla.jpg)
 
 This is Team Vulture project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. The project will require the use of Ubuntu Linux (the operating system of Carla) and a new simulator with integration with the Robotic Operation System or ROS.  This project will restrict the driving speed of Carla to ~ 10 MPH for field testing.
 
