@@ -1,4 +1,5 @@
-## Udacity Self Driving Car Engineer Nanodegree Final Project: System Integration
+## Udacity Self-Driving Car Engineer Nanodegree
+### Final Project: System Integration
 
 ![Carla](./imgs/Carla.jpg)
 
