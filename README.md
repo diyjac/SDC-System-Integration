@@ -16,20 +16,20 @@ __WARNING:__ *To maintain integrity of the SDCND Final System Integration Projec
 
 The following are the members of Team Vulture. Artwork for printing our team T-Shirt can be found [here](./imgs/T-Shirt/README.md).
 
-|              |     Name      | Location | Image |
-|--------------|---------------|----------|--------------------------------|
-| __Team Lead__| John Chen | Ashburn, VA | <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
-|| Rainer Bareiß | Stuttgart, Germany | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
-|| Sebastian Trick | Karlsruhe, Germany | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
-|| Yuesong Xie | Southfield, MI | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
-|| Kunfeng Chen | Mountain View, CA | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
+|              |     Name      | Location | LinkedIn | Image |
+|--------------|---------------|----------|----------|--------------------------------|
+| __Team Lead__| John Chen | Ashburn, VA | [linkedin.com/in/diyjac](https://linkedin.com/in/diyjac) | <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
+|| Rainer Bareiß | Stuttgart, Germany | [linkedin.com/in/rainer-bareiss](https://linkedin.com/in/rainer-bareiss) | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
+|| Sebastian Trick | Karlsruhe, Germany | [linkedin.com/in/sebastian-trick-500194ab](https://linkedin.com/in/sebastian-trick-500194ab) | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
+|| Yuesong Xie | Southfield, MI | [linkedin.com/in/yuesongxie](https://linkedin.com/in/yuesongxie) | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Kunfeng Chen | Mountain View, CA | [linkedin.com/in/kunfengchen](https://linkedin.com/in/kunfengchen) | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
 
 ### Team Vulture Accomplishments
 #### 1. First team to move Carla
 [![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
-#### 2. First team to successfully navigate Carla in test track and stop appropriately for the lights
+#### 2. First team to successfully navigate Carla around the test track and stop appropriately for the lights
 [![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
-#### 3. First team to complete Udacity SDCND System Integration Project
+#### 3. First team to complete Udacity Self-Driving Car Engineer Nanodegree Final Project
 ![Team Vulture Project Completion](./imgs/project-completion-final.png)
 #### 4. Rainer Bareiß Designed and Made Team Vulture T-Shirts!
 ![Kunfeng Team T-Shirt](./imgs/kunfeng_tshirt.jpg)
