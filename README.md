@@ -21,7 +21,7 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 | __Team Lead__| John Chen | Ashburn, VA | [linkedin.com/in/diyjac](https://linkedin.com/in/diyjac) | <img src="./imgs/team/JohnChen.jpg" alt="John Chen" width="150" height="150"> |
 || Rainer Bareiß | Stuttgart, Germany | [linkedin.com/in/rainer-bareiss](https://linkedin.com/in/rainer-bareiss) | <img src="./imgs/team/RainerBareiss.jpg" alt="Rainer Bareiß" width="150" height="150"> |
 || Sebastian Trick | Karlsruhe, Germany | [linkedin.com/in/sebastian-trick-500194ab](https://linkedin.com/in/sebastian-trick-500194ab) | <img src="./imgs/team/SebastianTrick.jpg" alt="Sebastian Trick" width="150" height="150">  |
-|| Yuesong Xie | Southfield, MI | [linked.com/in/yuesongxie](https://linked.com/in/yuesongxie) | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
+|| Yuesong Xie | Southfield, MI | [linkedin.com/in/yuesongxie](https://linkedin.com/in/yuesongxie) | <img src="./imgs/team/YuesongXie.jpg" alt="Yuesong Xie" width="150" height="150">  |
 || Kunfeng Chen | Mountain View, CA | [linkedin.com/in/kunfengchen](https://linkedin.com/in/kunfengchen) | <img src="./imgs/team/KunfengChen.jpg" alt="Kunfeng Chen" width="150" height="150"> |
 
 ### Team Vulture Accomplishments
