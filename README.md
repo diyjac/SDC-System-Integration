@@ -27,7 +27,7 @@ The following are the members of Team Vulture. Artwork for printing our team T-S
 ### Team Vulture Accomplishments
 #### 1. First team to move Carla
 [![Team Vulture First to Move Carla!](./imgs/vulture-first-udacity-sdc-team-to-move-carla.png)](https://www.youtube.com/watch?v=MfNFXf6fuzk)
-#### 2. First team to successfully navigate Carla in test track and stop appropriately for the lights
+#### 2. First team to successfully navigate Carla the test track and stop appropriately for the lights
 [![Team Vulture First to Successfully Navigate Carla!](./imgs/vulture-first-udacity-sdc-team-to-successfully-navigate-carla.png)](https://youtu.be/MV5Dmj3c9oY)
 #### 3. First team to complete Udacity Self-Driving Car Engineer Nanodegree Final Project
 ![Team Vulture Project Completion](./imgs/project-completion-final.png)
